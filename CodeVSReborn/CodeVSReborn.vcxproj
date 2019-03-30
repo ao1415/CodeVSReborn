@@ -117,6 +117,15 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Ai.hpp" />
+    <ClInclude Include="Base.hpp" />
+    <ClInclude Include="Clock.hpp" />
+    <ClInclude Include="Field.hpp" />
+    <ClInclude Include="FixedGrid.hpp" />
+    <ClInclude Include="Pack.hpp" />
+    <ClInclude Include="Share.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
