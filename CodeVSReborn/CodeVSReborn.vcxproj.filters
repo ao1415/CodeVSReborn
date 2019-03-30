@@ -9,6 +9,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\Utility">
+      <UniqueIdentifier>{da7b3c6d-d8e8-4bd2-a9b5-6eb122a8d58c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Data">
+      <UniqueIdentifier>{34636d02-1f02-4100-8f2f-276cb81020f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Ai">
+      <UniqueIdentifier>{53ab0b79-02f2-4361-b244-21405c7e8c8f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -19,23 +28,23 @@
     <ClInclude Include="Base.hpp">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Pack.hpp">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Clock.hpp">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Field.hpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Utility</Filter>
     </ClInclude>
     <ClInclude Include="FixedGrid.hpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Ai.hpp">
-      <Filter>ソース ファイル</Filter>
+    <ClInclude Include="Field.hpp">
+      <Filter>ソース ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Pack.hpp">
+      <Filter>ソース ファイル\Data</Filter>
     </ClInclude>
     <ClInclude Include="Share.hpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Ai.hpp">
+      <Filter>ソース ファイル\Ai</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

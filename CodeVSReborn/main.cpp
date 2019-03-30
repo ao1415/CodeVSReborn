@@ -7,7 +7,8 @@ std::shared_ptr<Share> Share::instance;
 int main() {
 
 	Share::Create();
-	Stopwatch sw;
+	const auto share = Share::Get();
+	
 
 	std::cout << "ao1415" << std::endl;
 	std::cout.flush();
@@ -15,13 +16,14 @@ int main() {
 	Input input;
 	input.first();
 
+	Stopwatch sw;
 	Ai ai;
-
 
 	for (int i = 0; i < MaxTurn; i++)
 	{
 		input.loop();
 
+		std::cerr << "turn:" << std::setw(3) << share.turn() << "================" << std::endl;
 		sw.start();
 		const std::string command = ai.think();
 		sw.stop();
