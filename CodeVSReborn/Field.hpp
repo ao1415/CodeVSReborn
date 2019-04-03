@@ -13,6 +13,7 @@ private:
 
 	void setElevation() {
 
+		elevation.fill(Height - 1);
 		for (int x = 0; x < Witdh; x++)
 		{
 			for (int y = DangerLine; y < Height; y++)
@@ -89,9 +90,10 @@ private:
 					{
 						w++;
 					}
-					if (sub > Elimination)
+					else if (sub > Elimination)
 					{
 						w = std::max(1, w - 1);
+						break;
 					}
 					else
 					{
@@ -119,9 +121,10 @@ private:
 					{
 						h++;
 					}
-					if (sub > Elimination)
+					else if (sub > Elimination)
 					{
 						h = std::max(1, h - 1);
+						break;
 					}
 					else
 					{
@@ -142,10 +145,8 @@ private:
 			int y = 0;
 
 			int w = 1;
-			for (int i; i < Height; i++)
+			for (int i = 0; i < Height; i++)
 			{
-				x++;
-				y++;
 				while (inside(x + w, y + w))
 				{
 					const auto sub = cumulative[1][y + w][x + w] - cumulative[1][y][x] + table[y][x];
@@ -154,9 +155,10 @@ private:
 					{
 						w++;
 					}
-					if (sub > Elimination)
+					else if (sub > Elimination)
 					{
 						w = std::max(1, w - 1);
+						break;
 					}
 					else
 					{
@@ -167,6 +169,13 @@ private:
 						break;
 					}
 				}
+
+				x++;
+				y++;
+
+				if (!inside(x, y))
+					break;
+
 			}
 		}
 		for (int s = 1; s < Height; s++)
@@ -175,10 +184,8 @@ private:
 			int y = s;
 
 			int w = 1;
-			for (int i; i < Height; i++)
+			for (int i = 0; i < Height; i++)
 			{
-				x++;
-				y++;
 				while (inside(x + w, y + w))
 				{
 					const auto sub = cumulative[1][y + w][x + w] - cumulative[1][y][x] + table[y][x];
@@ -187,9 +194,10 @@ private:
 					{
 						w++;
 					}
-					if (sub > Elimination)
+					else if (sub > Elimination)
 					{
 						w = std::max(1, w - 1);
+						break;
 					}
 					else
 					{
@@ -200,6 +208,13 @@ private:
 						break;
 					}
 				}
+
+				x++;
+				y++;
+
+				if (!inside(x, y))
+					break;
+
 			}
 		}
 
@@ -210,31 +225,37 @@ private:
 			int y = 0;
 
 			int w = 1;
-			for (int i; i < Height; i++)
+			for (int i = 0; i < Height; i++)
 			{
-				x--;
-				y++;
-				while (inside(x + w, y + w))
+				while (inside(x - w, y + w))
 				{
-					const auto sub = cumulative[1][y + w][x + w] - cumulative[1][y][x] + table[y][x];
+					const auto sub = cumulative[3][y + w][x - w] - cumulative[3][y][x] + table[y][x];
 
 					if (sub < Elimination)
 					{
 						w++;
 					}
-					if (sub > Elimination)
+					else if (sub > Elimination)
 					{
 						w = std::max(1, w - 1);
+						break;
 					}
 					else
 					{
 						for (int p = 0; p <= w; p++)
 						{
-							bitField[y + p][x + p] = true;
+							bitField[y + p][x - p] = true;
 						}
 						break;
 					}
 				}
+
+				x--;
+				y++;
+
+				if (!inside(x, y))
+					break;
+
 			}
 		}
 		for (int s = 1; s < Height; s++)
@@ -243,31 +264,37 @@ private:
 			int y = s;
 
 			int w = 1;
-			for (int i; i < Height; i++)
+			for (int i = 0; i < Height; i++)
 			{
-				x++;
-				y++;
-				while (inside(x + w, y + w))
+				while (inside(x - w, y + w))
 				{
-					const auto sub = cumulative[1][y + w][x + w] - cumulative[1][y][x] + table[y][x];
+					const auto sub = cumulative[3][y + w][x - w] - cumulative[3][y][x] + table[y][x];
 
 					if (sub < Elimination)
 					{
 						w++;
 					}
-					if (sub > Elimination)
+					else if (sub > Elimination)
 					{
 						w = std::max(1, w - 1);
+						break;
 					}
 					else
 					{
 						for (int p = 0; p <= w; p++)
 						{
-							bitField[y + p][x + p] = true;
+							bitField[y + p][x - p] = true;
 						}
 						break;
 					}
 				}
+
+				x--;
+				y++;
+
+				if (!inside(x, y))
+					break;
+
 			}
 		}
 
@@ -306,7 +333,25 @@ private:
 					index--;
 				}
 			}
+			elevation[x] = index;
 		}
+
+	}
+
+	void setNextField(const Pack& pack, const Command& command) {
+
+		const auto& pos = command.pos;
+		const auto& r = command.rotate;
+
+		table[elevation[pos + 0] - 1][pos + 0] = pack[r][0][0];
+		table[elevation[pos + 0] - 0][pos + 0] = pack[r][1][0];
+		table[elevation[pos + 1] - 1][pos + 1] = pack[r][0][1];
+		table[elevation[pos + 1] - 0][pos + 1] = pack[r][1][1];
+
+		elevation[pos + 0] -= 2;
+		elevation[pos + 1] -= 2;
+
+		dropBlock();
 
 	}
 
@@ -318,25 +363,9 @@ public:
 
 	}
 
-	void setNextField(const Pack& pack, const Command& command) {
+	Field&& getNextField(const Pack& pack, const Command& command) const {
 
-		const auto& pos = command.pos;
-		const auto& r = command.rotate;
-
-		table[elevation[pos] - 1][pos + 0] = pack[r][0][0];
-		table[elevation[pos] - 0][pos + 0] = pack[r][1][0];
-		table[elevation[pos] - 1][pos + 1] = pack[r][0][1];
-		table[elevation[pos] - 0][pos + 1] = pack[r][1][1];
-
-		elevation[pos + 0] += 2;
-		elevation[pos + 1] += 2;
-
-		setCumulative();
-	}
-
-	Field&& getNextField(const Pack& pack, const Command& command) {
-
-		Field next;
+		Field next(*this);
 		next.setNextField(pack, command);
 
 		return std::move(next);
@@ -347,16 +376,35 @@ public:
 		setCumulative();
 
 		int score = 0;
-		int chain = 1;
+		int chain = 0;
+
+		debug();
 
 		while (eraseBlock())
 		{
-			score += static_cast<int>(std::pow(1.3, chain));
+			debug();
 			chain++;
+			score += static_cast<int>(std::pow(1.3, chain));
 			dropBlock();
+			setCumulative();
 		}
+		debug();
 
 		return Chain(chain, score);
+	}
+
+	void debug() const {
+
+		for (int y = 0; y < Height; y++)
+		{
+			for (int x = 0; x < Witdh - 1; x++)
+			{
+				std::cerr << table[y][x] << " ";
+			}
+			std::cerr << table[y][Witdh - 1] << std::endl;
+		}
+		std::cerr << std::endl;
+
 	}
 
 	static Field&& Creat() {
@@ -367,8 +415,9 @@ public:
 		{
 			for (int x = 0; x < Witdh; x++)
 			{
-				field.table[y][x] = readNum();
+				std::cin >> field.table[y][x];
 			}
+			std::cin.ignore();
 		}
 
 		std::string end;

@@ -7,12 +7,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CodeVSReborn", "CodeVSRebor
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug(Redirect)|x64 = Debug(Redirect)|x64
+		Debug(Redirect)|x86 = Debug(Redirect)|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F5B995A9-D42B-40B0-BB8F-310C4ABD7212}.Debug(Redirect)|x64.ActiveCfg = Debug(Redirect)|x64
+		{F5B995A9-D42B-40B0-BB8F-310C4ABD7212}.Debug(Redirect)|x64.Build.0 = Debug(Redirect)|x64
+		{F5B995A9-D42B-40B0-BB8F-310C4ABD7212}.Debug(Redirect)|x86.ActiveCfg = Debug(Redirect)|Win32
+		{F5B995A9-D42B-40B0-BB8F-310C4ABD7212}.Debug(Redirect)|x86.Build.0 = Debug(Redirect)|Win32
 		{F5B995A9-D42B-40B0-BB8F-310C4ABD7212}.Debug|x64.ActiveCfg = Debug|x64
 		{F5B995A9-D42B-40B0-BB8F-310C4ABD7212}.Debug|x64.Build.0 = Debug|x64
 		{F5B995A9-D42B-40B0-BB8F-310C4ABD7212}.Debug|x86.ActiveCfg = Debug|Win32

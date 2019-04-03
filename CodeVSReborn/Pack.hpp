@@ -7,7 +7,7 @@ private:
 
 	std::array<PackArray, 4> packs;
 
-	static PackArray&& Rotate(const PackArray& basePack) {
+	PackArray rotate(const PackArray& basePack) {
 
 		PackArray rotatedPack;
 
@@ -32,17 +32,15 @@ public:
 		PackArray basePack;
 		std::string end;
 
-		basePack[0][0] = readNum();
-		basePack[0][1] = readNum();
-		basePack[1][0] = readNum();
-		basePack[1][1] = readNum();
+		std::cin >> basePack[0][0] >> basePack[0][1];
+		std::cin >> basePack[1][0] >> basePack[1][1];
 
 		std::cin >> end;
 
-		pack[0] = basePack;
-		pack[1] = Rotate(pack[0]);
-		pack[2] = Rotate(pack[1]);
-		pack[3] = Rotate(pack[2]);
+		pack.packs[0] = basePack;
+		pack.packs[1] = pack.rotate(pack.packs[0]);
+		pack.packs[2] = pack.rotate(pack.packs[1]);
+		pack.packs[3] = pack.rotate(pack.packs[2]);
 
 		return std::move(pack);
 	}

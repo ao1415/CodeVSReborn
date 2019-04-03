@@ -23,7 +23,7 @@
 
 using Num = int;
 
-constexpr int DangerLine = 2;;
+constexpr int DangerLine = 3;
 
 constexpr int Witdh = 10;
 constexpr int Height = 16 + DangerLine;
@@ -42,12 +42,6 @@ const std::string Skill = "S";
 using PackArray = FixedGrid<Num, PackSize, PackSize>;
 using FieldArray = FixedGrid<Num, Witdh, Height>;
 using BitFieldArray = FixedGrid<bool, Witdh, Height>;
-
-inline const Num readNum() {
-	int v;
-	std::cin >> v;
-	return static_cast<Num>(v);
-}
 
 struct Command {
 	int pos = 0;
@@ -72,5 +66,6 @@ struct Chain {
 	int score = 0;
 };
 
-inline bool inside(const int& v, const int& max) { return (0 <= v && v < max); }
-inline bool inside(const std::pair<int, int>& pos) { return (inside(pos.first, Witdh) && inside(pos.second, Height)); }
+inline bool _inside(const int& v, const int& max) { return (0 <= v && v < max); }
+inline bool inside(const int& x, const int& y) { return (_inside(x, Witdh) && _inside(y, Height)); }
+inline bool inside(const std::pair<int, int>& pos) { return inside(pos.first, pos.second); }
