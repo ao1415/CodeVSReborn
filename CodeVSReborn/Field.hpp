@@ -133,7 +133,7 @@ private:
 
 		return Chain(0, score, score / 2);
 	}
-	const Chain dropBlock() {
+	const Chain chainBlock() {
 
 		int score = 0;
 		int chain = 0;
@@ -213,7 +213,9 @@ public:
 
 		setPack(pack, command);
 
-		const auto chain = dropBlock();
+		const auto chain = chainBlock();
+
+		debug();
 
 		return chain;
 	}
@@ -223,21 +225,23 @@ public:
 		const auto bomb = bombBlock();
 		fallBlock();
 
-		const auto chain = dropBlock();
+		const auto chain = chainBlock();
 
-		return Chain(bomb.chain+chain.chain, bomb.score + chain.score, bomb.garbage + chain.garbage);
+		debug();
+
+		return Chain(bomb.chain + chain.chain, bomb.score + chain.score, bomb.garbage + chain.garbage);
 	}
 
-	[[deprecated("used for debug only")]]
+	//[[deprecated("used for debug only")]]
 	void debug() const {
 
 		for (int y = 0; y < Height; y++)
 		{
-			for (int x = 0; x < Witdh - 1; x++)
+			for (int x = 0; x < Witdh; x++)
 			{
-				std::cerr << (table[y][x] < Elimination ? std::to_string(table[y][x]) : "#") << " ";
+				//std::cerr << (table[y][x] < Elimination ? std::to_string(table[y][x]) : "#") << " ";
+				std::cerr << table[y][x] << " ";
 			}
-			std::cerr << table[y][Witdh - 1] << std::endl;
 		}
 		std::cerr << std::endl;
 

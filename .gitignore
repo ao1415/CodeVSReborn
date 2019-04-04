@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 *.txt
+/CodeVSReborn/Debug(Redirect)
+/Debug(Redirect)
