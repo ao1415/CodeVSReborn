@@ -61,12 +61,11 @@ struct Command {
 
 struct Chain {
 
-	Chain(int c, int s) : chain(c), score(s) {}
-
-	int getGarbage() const { return score / 2; }
+	Chain(int c, int s, int g) : chain(c), score(s), garbage(g) {}
 
 	int chain = 0;
 	int score = 0;
+	int garbage = 0;
 };
 
 inline bool _inside(const int& v, const int& max) { return (0 <= v && v < max); }

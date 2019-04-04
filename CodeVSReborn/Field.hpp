@@ -72,7 +72,83 @@ private:
 		return isErase;
 	}
 
-	void dropBlock() {
+	const Chain bombBlock() {
+
+		const Num BombNumber = 5;
+
+		BitFieldArray bitField(false);
+
+		//横・右下・下・左下
+		int dx[] = { 1,1,0,-1 };
+		int dy[] = { 0,1,1,1 };
+
+		for (int y = 0; y < Height - 1; y++)
+		{
+			for (int x = 0; x < Witdh - 1; x++)
+			{
+				if (table[y][x] == BombNumber)
+				{
+					bitField[y][x] = true;
+					for (int d = 0; d < 4; d++)
+					{
+						int px = x + dx[d];
+						int py = y + dy[d];
+
+						if (table[py][px] != Garbage)
+						{
+							bitField[py][px] = true;
+						}
+					}
+				}
+				else if (table[y][x] != Garbage)
+				{
+					for (int d = 0; d < 4; d++)
+					{
+						int px = x + dx[d];
+						int py = y + dy[d];
+
+						if (table[py][px] == BombNumber)
+						{
+							bitField[y][x] = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+
+		int score = 0;
+		for (int y = 0; y < Height; y++)
+		{
+			for (int x = 0; x < Witdh; x++)
+			{
+				if (bitField[y][x])
+				{
+					table[y][x] = Empty;
+					score++;
+				}
+			}
+		}
+
+		return Chain(0, score, score / 2);
+	}
+	const Chain dropBlock() {
+
+		int score = 0;
+		int chain = 0;
+
+		while (eraseBlock())
+		{
+			chain++;
+			score += static_cast<int>(std::pow(1.3, chain));
+			fallBlock();
+		}
+
+		return Chain(chain, score, score / 2);
+	}
+
+	void fallBlock() {
 
 		for (int x = 0; x < Witdh; x++)
 		{
@@ -127,9 +203,8 @@ private:
 public:
 
 	Field() {
-
 		table.fill(0);
-
+		elevation.fill(Height - 1);
 	}
 
 	Field copy() const { return std::move(Field(*this)); }
@@ -138,17 +213,19 @@ public:
 
 		setPack(pack, command);
 
-		int score = 0;
-		int chain = 0;
+		const auto chain = dropBlock();
 
-		while (eraseBlock())
-		{
-			chain++;
-			score += static_cast<int>(std::pow(1.3, chain));
-			dropBlock();
-		}
+		return chain;
+	}
 
-		return Chain(chain, score);
+	const Chain useSkill() {
+
+		const auto bomb = bombBlock();
+		fallBlock();
+
+		const auto chain = dropBlock();
+
+		return Chain(bomb.chain+chain.chain, bomb.score + chain.score, bomb.garbage + chain.garbage);
 	}
 
 	[[deprecated("used for debug only")]]
