@@ -145,20 +145,17 @@ public:
 		int score = 0;
 		int chain = 0;
 
-		debug();
-
 		while (eraseBlock())
 		{
-			debug();
 			chain++;
 			score += static_cast<int>(std::pow(1.3, chain));
 			dropBlock();
 		}
-		debug();
 
 		return Chain(chain, score);
 	}
 
+	[[deprecated("used for debug only")]]
 	void debug() const {
 
 		for (int y = 0; y < Height; y++)
@@ -173,7 +170,7 @@ public:
 
 	}
 
-	static Field&& Creat() {
+	static Field Creat() {
 
 		Field field;
 

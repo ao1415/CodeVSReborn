@@ -25,7 +25,7 @@ public:
 
 	const PackArray& operator[](const int n) const { return this->packs[n]; }
 
-	static Pack&& Create() {
+	static Pack Create() {
 
 		Pack pack;
 
