@@ -33,9 +33,10 @@ constexpr int PackSize = 2;
 
 constexpr int PackDropRange = 8;
 constexpr Num Empty = 0;
-constexpr int Inf = 99;
+constexpr Num Inf = 99;
 
 constexpr Num Elimination = 10;
+constexpr Num Garbage = 11;
 
 const std::string Skill = "S";
 
@@ -61,6 +62,8 @@ struct Command {
 struct Chain {
 
 	Chain(int c, int s) : chain(c), score(s) {}
+
+	int getGarbage() const { return score / 2; }
 
 	int chain = 0;
 	int score = 0;

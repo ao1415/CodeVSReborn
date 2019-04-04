@@ -32,9 +32,9 @@ public:
 		const auto my = share->my();
 		const auto& field = my.field;
 
-		auto next = field.getNextField(packs[turn], com);
+		auto next = field.copy();
 
-		const auto result = next.simulation();
+		const auto result = next.dropPack(packs[turn], com);
 
 		std::cerr << "c:" << result.chain << ", s:" << result.score << std::endl;
 

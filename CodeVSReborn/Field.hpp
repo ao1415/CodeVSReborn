@@ -96,7 +96,7 @@ private:
 
 	}
 
-	void setNextField(const Pack& pack, const Command& command) {
+	void setPack(const Pack& pack, const Command& command) {
 
 		const auto& pos = command.pos;
 		const auto& r = command.rotate;
@@ -132,15 +132,11 @@ public:
 
 	}
 
-	Field getNextField(const Pack& pack, const Command& command) const {
+	Field copy() const { return std::move(Field(*this)); }
 
-		Field next(*this);
-		next.setNextField(pack, command);
+	const Chain dropPack(const Pack& pack, const Command& command) {
 
-		return std::move(next);
-	}
-
-	const Chain simulation() {
+		setPack(pack, command);
 
 		int score = 0;
 		int chain = 0;
