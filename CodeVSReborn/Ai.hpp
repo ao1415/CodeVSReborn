@@ -22,19 +22,30 @@ public:
 
 	std::string think() {
 
-		const auto share = Share::Get();
-		const auto turn = share->turn();
+		const auto share = *Share::Get();
+		const auto turn = share.turn();
 
-		Command com;
-		com.pos = rand() % PackDropRange;
-		com.rotate = rand() % 4;
-
-		const auto my = share->my();
+		const auto my = share.my();
 		const auto& field = my.field;
 
 		auto next = field.copy();
 
-		const auto result = next.dropPack(packs[turn], com);
+		Command com;
+		Chain result;
+		if (my.gauge >= SkillCost)
+		{
+			com.skill = true;
+
+			result = next.useSkill();
+		}
+		else
+		{
+			com.pos = rand() % PackDropRange;
+			com.rotate = rand() % 4;
+
+			result = next.dropPack(packs[turn], com);
+		}
+
 
 		std::cerr << "c:" << result.chain << ", s:" << result.score << std::endl;
 

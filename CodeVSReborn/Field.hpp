@@ -82,9 +82,9 @@ private:
 		int dx[] = { 1,1,0,-1 };
 		int dy[] = { 0,1,1,1 };
 
-		for (int y = 0; y < Height - 1; y++)
+		for (int y = 0; y < Height; y++)
 		{
-			for (int x = 0; x < Witdh - 1; x++)
+			for (int x = 0; x < Witdh; x++)
 			{
 				if (table[y][x] == BombNumber)
 				{
@@ -94,9 +94,12 @@ private:
 						int px = x + dx[d];
 						int py = y + dy[d];
 
-						if (table[py][px] != Garbage)
+						if (inside(px, py))
 						{
-							bitField[py][px] = true;
+							if (table[py][px] != Garbage)
+							{
+								bitField[py][px] = true;
+							}
 						}
 					}
 				}
@@ -107,18 +110,21 @@ private:
 						int px = x + dx[d];
 						int py = y + dy[d];
 
-						if (table[py][px] == BombNumber)
+						if (inside(px, py))
 						{
-							bitField[y][x] = true;
-							break;
+							if (table[py][px] == BombNumber)
+							{
+								bitField[y][x] = true;
+								bitField[py][px] = true;
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
 
-
-		int score = 0;
+		int disBlock = 0;
 		for (int y = 0; y < Height; y++)
 		{
 			for (int x = 0; x < Witdh; x++)
@@ -126,10 +132,11 @@ private:
 				if (bitField[y][x])
 				{
 					table[y][x] = Empty;
-					score++;
+					disBlock++;
 				}
 			}
 		}
+		int score = static_cast<int>(25.0 * pow(2.0, disBlock / 12.0));
 
 		return Chain(0, score, score / 2);
 	}
@@ -215,7 +222,7 @@ public:
 
 		const auto chain = chainBlock();
 
-		debug();
+		//debug();
 
 		return chain;
 	}
@@ -227,12 +234,12 @@ public:
 
 		const auto chain = chainBlock();
 
-		debug();
+		//debug();
 
 		return Chain(bomb.chain + chain.chain, bomb.score + chain.score, bomb.garbage + chain.garbage);
 	}
 
-	//[[deprecated("used for debug only")]]
+	[[deprecated("used for debug only")]]
 	void debug() const {
 
 		for (int y = 0; y < Height; y++)
@@ -242,8 +249,8 @@ public:
 				//std::cerr << (table[y][x] < Elimination ? std::to_string(table[y][x]) : "#") << " ";
 				std::cerr << table[y][x] << " ";
 			}
+			std::cerr << std::endl;
 		}
-		std::cerr << std::endl;
 
 	}
 

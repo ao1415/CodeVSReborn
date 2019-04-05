@@ -35,6 +35,8 @@ constexpr int PackDropRange = 8;
 constexpr Num Empty = 0;
 constexpr Num Inf = 99;
 
+constexpr int SkillCost = 80;
+
 constexpr Num Elimination = 10;
 constexpr Num Garbage = 11;
 
@@ -61,6 +63,7 @@ struct Command {
 
 struct Chain {
 
+	Chain() : Chain(0, 0, 0) {}
 	Chain(int c, int s, int g) : chain(c), score(s), garbage(g) {}
 
 	int chain = 0;

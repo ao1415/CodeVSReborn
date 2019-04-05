@@ -43,13 +43,13 @@ public:
 		std::cin >> m_turn;
 
 		std::cin >> m_my.time;
-		std::cin >> m_my.gauge;
 		std::cin >> m_my.garbage;
+		std::cin >> m_my.gauge;
 		m_my.field = Field::Creat();
 
 		std::cin >> m_enemy.time;
-		std::cin >> m_enemy.gauge;
  		std::cin >> m_enemy.garbage;
+		std::cin >> m_enemy.gauge;
 		m_enemy.field = Field::Creat();
 	}
 
