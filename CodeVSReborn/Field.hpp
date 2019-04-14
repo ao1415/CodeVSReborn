@@ -239,6 +239,8 @@ public:
 		return Chain(bomb.chain + chain.chain, bomb.score + chain.score, bomb.garbage + chain.garbage);
 	}
 
+	const FieldArray& getFieldArray() const { return table; }
+	
 	[[deprecated("used for debug only")]]
 	void debug() const {
 

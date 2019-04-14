@@ -51,6 +51,15 @@ struct Command {
 	int rotate = 0;
 	bool skill = false;
 
+	Command() : Command(0, 0, false) {}
+	Command(int p, int r) : Command(p, r, false) {}
+	Command(bool s) : Command(0, 0, s) {}
+	Command(int p, int r, bool s) {
+		pos = p;
+		rotate = r;
+		skill = s;
+	}
+
 	std::string toString() const {
 
 		if (!skill)
