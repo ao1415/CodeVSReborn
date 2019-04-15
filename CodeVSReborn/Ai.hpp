@@ -74,7 +74,7 @@ public:
 		std::vector<int> drop({ 0,2,4 });
 
 		const auto table = field.getFieldArray();
-		const int deadline = DangerLine + 3;
+		const int deadline = DangerLine + 5;
 
 		for (int i = 0; i < (int)drop.size(); i++)
 		{

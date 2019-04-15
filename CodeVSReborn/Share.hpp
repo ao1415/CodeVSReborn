@@ -10,6 +10,7 @@ struct PlayerInfo {
 	int time = 0;
 	int garbage = 0;
 	int gauge = 0;
+	int score = 0;
 	Field field;
 };
 
@@ -45,11 +46,13 @@ public:
 		std::cin >> m_my.time;
 		std::cin >> m_my.garbage;
 		std::cin >> m_my.gauge;
+		std::cin >> m_my.score;
 		m_my.field = Field::Creat();
 
 		std::cin >> m_enemy.time;
  		std::cin >> m_enemy.garbage;
 		std::cin >> m_enemy.gauge;
+		std::cin >> m_enemy.score;
 		m_enemy.field = Field::Creat();
 	}
 
