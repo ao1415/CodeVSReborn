@@ -17,6 +17,7 @@
 #include <memory>
 
 #include <cmath>
+#include <tuple>
 
 #include "FixedGrid.hpp"
 #include "Clock.hpp"
@@ -36,6 +37,7 @@ constexpr Num Empty = 0;
 constexpr Num Inf = 99;
 
 constexpr int SkillCost = 80;
+constexpr int GaugeAdd = 8;
 
 constexpr Num Elimination = 10;
 constexpr Num Garbage = 11;
@@ -60,6 +62,7 @@ struct Command {
 		skill = s;
 	}
 
+	[[nodiscard]]
 	std::string toString() const {
 
 		if (!skill)
@@ -74,6 +77,27 @@ struct Chain {
 
 	Chain() : Chain(0, 0, 0) {}
 	Chain(int c, int s, int g) : chain(c), score(s), garbage(g) {}
+
+	[[nodiscard]]
+	Chain operator+(const Chain& other) const {
+		return Chain(chain + other.chain, score + other.score, garbage + other.garbage);
+	}
+	void operator+=(const Chain& other) {
+		chain += other.chain;
+		score += other.score;
+		garbage += other.garbage;
+	}
+
+	bool operator<(const Chain& other) const {
+		return score < other.score;
+	}
+
+	void debug() const {
+		std::cerr << "Chain" << std::endl;
+		std::cerr << "chain  :" << chain << std::endl;
+		std::cerr << "score  :" << score << std::endl;
+		std::cerr << "garbage:" << garbage << std::endl;
+	}
 
 	int chain = 0;
 	int score = 0;

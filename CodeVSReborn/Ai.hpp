@@ -9,6 +9,16 @@ struct Data {
 
 };
 
+struct EnemyData {
+	Chain chain;
+	PlayerInfo info;
+
+	bool operator<(const EnemyData& o) const {
+		return info.score < o.info.score;
+	}
+
+};
+
 class Ai {
 private:
 
@@ -22,28 +32,82 @@ private:
 
 	}
 
-	Chain enemyThink() {
+	[[nodiscard]]
+	EnemyData enemyThink() {
 
 		const auto& share = *Share::Get();
 
 		const auto& turn = share.turn();
 		const auto& enemy = share.enemy();
 
-		for (int pos = 0; pos < PackDropRange; pos++)
+		std::priority_queue<EnemyData> qData;
+
 		{
-			for (int rot = 0; rot < 4; rot++)
-			{
-				auto field = enemy.field.copy();
-				Command com;
-				com.pos = pos;
-				com.rotate = rot;
-
-				const auto chain = field.dropPack(packs[turn], com);
-
-			}
+			EnemyData now;
+			now.info = enemy;
+			qData.push(now);
 		}
 
-		return Chain();
+		for (int t = 0; t < 2; t++)
+		{
+			if (turn + t >= MaxTurn) break;
+
+			decltype(qData) next;
+
+			while (!qData.empty())
+			{
+				for (int pos = 0; pos < PackDropRange; pos++)
+				{
+					for (int rot = 0; rot < 4; rot++)
+					{
+						auto top = qData.top();
+
+						Command com(pos, rot);
+
+						top.chain += top.info.field.dropPack(packs[turn], com);
+						top.info.score += top.chain.score;
+						top.info.diffScore += top.chain.score;
+						top.info.garbage -= top.chain.garbage;
+						if (top.chain.chain > 0)
+							top.info.gauge += GaugeAdd;
+
+						if (top.info.garbage >= Witdh)
+						{
+							top.info.field.dropGarbage();
+							top.info.garbage -= Witdh;
+						}
+
+						next.push(std::move(top));
+					}
+				}
+
+				if (qData.top().info.gauge >= SkillCost)
+				{
+					auto top = qData.top();
+
+					Command com(true);
+
+					top.chain += top.info.field.useSkill();
+					top.info.score += top.chain.score;
+					top.info.diffScore += top.chain.score;
+					top.info.garbage -= top.chain.garbage;
+					top.info.gauge = 0;
+
+					if (top.info.garbage >= Witdh)
+					{
+						top.info.field.dropGarbage();
+						top.info.garbage -= Witdh;
+					}
+
+					next.push(std::move(top));
+				}
+				qData.pop();
+			}
+
+			qData.swap(next);
+		}
+
+		return qData.top();
 	}
 
 public:
@@ -66,44 +130,16 @@ public:
 
 		const auto& field = my.field;
 
-		if (my.gauge >= SkillCost)
-		{
-			return Command(true).toString();
-		}
+		const auto enemyData = enemyThink();
 
-		std::vector<int> drop({ 0,2,4 });
+		enemyData.chain.debug();
+		enemyData.info.debug();
 
-		const auto table = field.getFieldArray();
-		const int deadline = DangerLine + 5;
+		Command com;
+		com.pos = (turn % 4) * 2;
+		com.rotate = 0;
 
-		for (int i = 0; i < (int)drop.size(); i++)
-		{
-			if (table[deadline][drop[i]] == Empty && table[deadline][drop[i] + 1] == Empty)
-			{
-				return Command(drop[i], 0).toString();
-			}
-		}
-
-		int maxScore = -1;
-		Command maxCom;
-		for (int pos = 6; pos < PackDropRange; pos++)
-		{
-			for (int rot = 0; rot < 4; rot++)
-			{
-				Command com(pos, rot);
-
-				auto next = field.copy();
-				auto chain = next.dropPack(packs[turn], com);
-
-				if (chain.score > maxScore)
-				{
-					maxScore = chain.score;
-					maxCom = com;
-				}
-			}
-		}
-
-		return maxCom.toString();
+		return com.toString();
 	}
 
 };

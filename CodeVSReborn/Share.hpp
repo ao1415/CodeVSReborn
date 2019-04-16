@@ -11,7 +11,32 @@ struct PlayerInfo {
 	int garbage = 0;
 	int gauge = 0;
 	int score = 0;
+	int diffScore = 0;
 	Field field;
+
+	void input() {
+
+		int s = score;
+
+		std::cin >> time;
+		std::cin >> garbage;
+		std::cin >> gauge;
+		std::cin >> score;
+		field = Field::Creat();
+
+		diffScore = score - s;
+	}
+
+	void debug() const {
+
+		std::cerr << "PlayerInfo" << std::endl;
+		std::cerr << "time   :" << time << std::endl;
+		std::cerr << "garbage:" << garbage << std::endl;
+		std::cerr << "gauge  :" << gauge << std::endl;
+		std::cerr << "score  :" << score << std::endl;
+
+	}
+
 };
 
 class Share {
@@ -43,28 +68,26 @@ public:
 
 		std::cin >> m_turn;
 
-		std::cin >> m_my.time;
-		std::cin >> m_my.garbage;
-		std::cin >> m_my.gauge;
-		std::cin >> m_my.score;
-		m_my.field = Field::Creat();
+		m_my.input();
+		m_enemy.input();
 
-		std::cin >> m_enemy.time;
- 		std::cin >> m_enemy.garbage;
-		std::cin >> m_enemy.gauge;
-		std::cin >> m_enemy.score;
-		m_enemy.field = Field::Creat();
 	}
 
 	static void Create() { instance.reset(new Share()); }
+	[[nodiscard]]
 	static const std::shared_ptr<Share> Get() { return instance; }
 
+	[[nodiscard]]
 	const inline std::array<Pack, MaxTurn>& packs() const { return m_packs; }
+	[[nodiscard]]
 	const inline Pack& pack(const int n) const { return m_packs[n]; }
 
+	[[nodiscard]]
 	const inline int turn() const { return m_turn; }
 
+	[[nodiscard]]
 	const inline PlayerInfo& my() const { return m_my; }
+	[[nodiscard]]
 	const inline PlayerInfo& enemy() const { return m_enemy; }
 
 };

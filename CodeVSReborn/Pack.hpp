@@ -7,6 +7,7 @@ private:
 
 	std::array<PackArray, 4> packs;
 
+	[[nodiscard]]
 	PackArray rotate(const PackArray& basePack) {
 
 		PackArray rotatedPack;
@@ -19,12 +20,15 @@ private:
 		return std::move(rotatedPack);
 	}
 
+	[[nodiscard]]
 	PackArray& operator[](const int n) { return this->packs[n]; }
 
 public:
 
+	[[nodiscard]]
 	const PackArray& operator[](const int n) const { return this->packs[n]; }
 
+	[[nodiscard]]
 	static Pack Create() {
 
 		Pack pack;

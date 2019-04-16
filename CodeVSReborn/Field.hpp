@@ -9,6 +9,8 @@ private:
 	FieldArray table;
 	std::array<Num, Witdh> elevation;
 
+	bool survival = true;
+
 	void setElevation() {
 
 		elevation.fill(Height - 1);
@@ -70,6 +72,12 @@ private:
 		}
 
 		return isErase;
+	}
+
+	void checkDangerLine() {
+		survival = !std::any_of(elevation.cbegin(), elevation.cend(), [](int x) {
+			return x <= DangerLine;
+		});
 	}
 
 	const Chain bombBlock() {
@@ -152,6 +160,8 @@ private:
 			fallBlock();
 		}
 
+		checkDangerLine();
+
 		return Chain(chain, score, score / 2);
 	}
 
@@ -214,8 +224,10 @@ public:
 		elevation.fill(Height - 1);
 	}
 
+	[[nodiscard]]
 	Field copy() const { return std::move(Field(*this)); }
 
+	[[nodiscard]]
 	const Chain dropPack(const Pack& pack, const Command& command) {
 
 		setPack(pack, command);
@@ -227,20 +239,37 @@ public:
 		return chain;
 	}
 
+	[[nodiscard]]
 	const Chain useSkill() {
 
 		const auto bomb = bombBlock();
+
 		fallBlock();
 
 		const auto chain = chainBlock();
 
 		//debug();
 
-		return Chain(bomb.chain + chain.chain, bomb.score + chain.score, bomb.garbage + chain.garbage);
+		return bomb + chain;
 	}
 
+	void dropGarbage() {
+
+		for (int x = 0; x < Witdh; x++)
+		{
+			table[elevation[x]][x] = Garbage;
+			elevation[x]--;
+		}
+
+		checkDangerLine();
+	}
+
+	[[nodiscard]]
 	const FieldArray& getFieldArray() const { return table; }
-	
+	[[nodiscard]]
+	const bool isSurvival() const { return survival; }
+
+
 	[[deprecated("used for debug only")]]
 	void debug() const {
 
@@ -256,6 +285,7 @@ public:
 
 	}
 
+	[[nodiscard]]
 	static Field Creat() {
 
 		Field field;
