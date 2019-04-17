@@ -1,13 +1,11 @@
-rem "æå‡ºç”¨ZIPãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã—ã¾ã™"
+rem "’ño—pZIPƒtƒ@ƒCƒ‹‚ğì¬‚µ‚Ü‚·"
 
-del /q ./upload/
+del /q .\upload\
 
-copy ./CodeVSReborn/Makefile ./upload/
-copy ./CodeVSReborn/run.sh ./upload/
-copy ./CodeVSReborn/*.hpp ./upload/
-copy ./CodeVSReborn/*.cpp ./upload/
+copy .\CodeVSReborn\Makefile .\upload\
+copy .\CodeVSReborn\run.sh .\upload\
+copy .\CodeVSReborn\*.hpp .\upload\
+copy .\CodeVSReborn\*.cpp .\upload\
 
-7z.exe a upload.zip ./upload
-
-rem "ä½œæˆå®Œäº†ã—ã¾ã—ãŸ"
+rem "ì¬Š®—¹‚µ‚Ü‚µ‚½"
 pause
