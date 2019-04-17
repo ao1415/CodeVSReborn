@@ -107,14 +107,14 @@ private:
 
 						if (inside(px, py))
 						{
-							if (table[py][px] != Garbage)
+							if (table[py][px] != Garbage && table[py][px] != Empty)
 							{
 								bitField[py][px] = true;
 							}
 						}
 					}
 				}
-				else if (table[y][x] != Garbage)
+				else if (table[y][x] != Garbage && table[y][x] != Empty)
 				{
 					for (int d = 0; d < 4; d++)
 					{
