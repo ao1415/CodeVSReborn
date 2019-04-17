@@ -169,9 +169,9 @@ public:
 
 		const auto enemyData = enemyThink();
 
-		enemyData.chain.debug();
+		//enemyData.chain.debug();
 		enemyData.info.debug();
-		enemyData.info.field.debug();
+		//enemyData.info.field.debug();
 
 		std::array<std::priority_queue<Data>, Data::Turn + 1> qData;
 
@@ -183,7 +183,9 @@ public:
 		}
 
 		Timer timer;
-		timer.set(std::chrono::milliseconds(1500));
+		timer.set(std::chrono::milliseconds(1000));
+
+		long long int loop = 0;
 
 		timer.start();
 		while (!timer)
@@ -230,7 +232,10 @@ public:
 					qData[t].pop();
 				}
 			}
+			loop++;
 		}
+
+		std::cerr << "loop:" << loop << std::endl;
 
 		for (int i = Data::Turn - 1; i >= 0; i--)
 		{
