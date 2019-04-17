@@ -38,21 +38,24 @@ private:
 
 		BitFieldArray bitField(false);
 
-		for (int y = 0; y < Height - 1; y++)
+		for (int y = 0; y < Height; y++)
 		{
-			for (int x = 0; x < Witdh - 1; x++)
+			for (int x = 0; x < Witdh; x++)
 			{
 				for (int d = 0; d < 4; d++)
 				{
 					int px = x + dx[d];
 					int py = y + dy[d];
 
-					const int sum = table[y][x] + table[py][px];
-
-					if (sum == Elimination)
+					if (inside(px, py))
 					{
-						bitField[y][x] = true;
-						bitField[py][px] = true;
+						const int sum = table[y][x] + table[py][px];
+
+						if (sum == Elimination)
+						{
+							bitField[y][x] = true;
+							bitField[py][px] = true;
+						}
 					}
 				}
 			}
@@ -144,7 +147,10 @@ private:
 				}
 			}
 		}
-		int score = static_cast<int>(25.0 * pow(2.0, disBlock / 12.0));
+
+		int score = 0;
+		if (disBlock != 0)
+			score = static_cast<int>(25.0 * pow(2.0, disBlock / 12.0));
 
 		return Chain(0, score, score / 2);
 	}
@@ -270,7 +276,7 @@ public:
 	const bool isSurvival() const { return survival; }
 
 
-	[[deprecated("used for debug only")]]
+	//[[deprecated("used for debug only")]]
 	void debug() const {
 
 		for (int y = 0; y < Height; y++)

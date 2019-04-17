@@ -48,7 +48,7 @@ private:
 			qData.push(now);
 		}
 
-		for (int t = 0; t < 2; t++)
+		for (int t = 0; t < 1; t++)
 		{
 			if (turn + t >= MaxTurn) break;
 
@@ -64,12 +64,14 @@ private:
 
 						Command com(pos, rot);
 
-						top.chain += top.info.field.dropPack(packs[turn], com);
-						top.info.score += top.chain.score;
-						top.info.diffScore += top.chain.score;
-						top.info.garbage -= top.chain.garbage;
-						if (top.chain.chain > 0)
+						const auto chain = top.info.field.dropPack(packs[turn], com);
+						top.info.score += chain.score;
+						top.info.diffScore += chain.score;
+						top.info.garbage -= chain.garbage;
+						if (chain.chain > 0)
 							top.info.gauge += GaugeAdd;
+
+						top.chain += chain;
 
 						if (top.info.garbage >= Witdh)
 						{
@@ -87,17 +89,23 @@ private:
 
 					Command com(true);
 
-					top.chain += top.info.field.useSkill();
-					top.info.score += top.chain.score;
-					top.info.diffScore += top.chain.score;
-					top.info.garbage -= top.chain.garbage;
+					const auto chain = top.info.field.useSkill();
+					top.info.score += chain.score;
+					top.info.diffScore += chain.score;
+					top.info.garbage -= chain.garbage;
 					top.info.gauge = 0;
+
+					top.chain += chain;
 
 					if (top.info.garbage >= Witdh)
 					{
 						top.info.field.dropGarbage();
 						top.info.garbage -= Witdh;
 					}
+
+					//std::cerr << com.toString() << std::endl;
+					//top.chain.debug();
+					//top.info.debug();
 
 					next.push(std::move(top));
 				}
@@ -134,6 +142,7 @@ public:
 
 		enemyData.chain.debug();
 		enemyData.info.debug();
+		enemyData.info.field.debug();
 
 		Command com;
 		com.pos = (turn % 4) * 2;
