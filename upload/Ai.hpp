@@ -7,7 +7,7 @@
 
 struct Data {
 
-	const static int Turn = 18;
+	const static int Turn = 10;
 	const static int Chokudai = 3;
 
 	PlayerInfo info;
