@@ -7,7 +7,7 @@
 
 struct Data {
 
-	const static int Turn = 10;
+	const static int Turn = 18;
 	const static int Chokudai = 3;
 
 	PlayerInfo info;
@@ -183,7 +183,7 @@ public:
 		}
 
 		Timer timer;
-		timer.set(std::chrono::milliseconds(1000));
+		timer.set(std::chrono::milliseconds(1200));
 
 		long long int loop = 0;
 
