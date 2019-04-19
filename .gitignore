@@ -262,3 +262,5 @@ __pycache__/
 *.txt
 /CodeVSReborn/Debug(Redirect)
 /Debug(Redirect)
+/upload.zip
+*.diagsession
