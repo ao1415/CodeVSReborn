@@ -173,10 +173,10 @@ private:
 		}
 
 		int disBlock = 0;
-		for (int y = 0; y < Height; y++)
+		for (int x = 0; x < Witdh; x++)
 		{
 			bool update = false;
-			for (int x = 0; x < Witdh; x++)
+			for (int y = Height - 1; y > elevation[x]; y--)
 			{
 				if (bitField[y][x])
 				{
@@ -302,6 +302,7 @@ public:
 
 		//debug();
 
+		checkDangerLine();
 		return chain;
 	}
 
@@ -318,6 +319,7 @@ public:
 
 		//debug();
 
+		checkDangerLine();
 		return bomb + chain;
 	}
 
@@ -329,7 +331,6 @@ public:
 			elevation[x]--;
 		}
 
-		checkDangerLine();
 	}
 
 	[[nodiscard]]
