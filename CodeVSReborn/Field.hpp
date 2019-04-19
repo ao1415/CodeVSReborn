@@ -249,8 +249,8 @@ private:
 		const auto& pos = command.pos;
 		const auto& r = command.rotate;
 
-		int right = std::max(0, pos - 1);
-		int left = std::min(pos + 2, Witdh);
+		int right = std::min(pos + 2, Witdh - 1);
+		int left = std::max(0, pos - 1);
 
 		recalc[right] = std::min(elevation[right] + 1, Height - 1);
 		recalc[left] = std::min(elevation[left] + 1, Height - 1);

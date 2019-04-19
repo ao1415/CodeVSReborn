@@ -99,7 +99,7 @@ private:
 			qData.push(now);
 		}
 
-		for (int t = 0; t < 1; t++)
+		for (int t = 0; t < 2; t++)
 		{
 			if (turn + t >= MaxTurn) break;
 
@@ -171,7 +171,7 @@ public:
 
 		//enemyData.chain.debug();
 		enemyData.info.debug();
-		enemyData.info.field.debug();
+		//enemyData.info.field.debug();
 
 		std::array<std::priority_queue<Data>, Data::Turn + 1> qData;
 

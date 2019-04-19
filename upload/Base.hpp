@@ -32,7 +32,7 @@ constexpr int Height = 16 + DangerLine;
 constexpr int MaxTurn = 500;
 constexpr int PackSize = 2;
 
-constexpr int PackDropRange = 8;
+constexpr int PackDropRange = 9;
 constexpr Num Empty = 0;
 constexpr Num Inf = 99;
 

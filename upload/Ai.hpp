@@ -46,22 +46,28 @@ private:
 
 		if (com.skill)
 		{
-			const auto chain = info.field.useSkill();
-			info.score += chain.score;
-			info.diffScore += chain.score;
-			info.garbage -= chain.garbage;
-			info.gauge = 0;
-
 			if (info.garbage >= Witdh)
 			{
 				info.field.dropGarbage();
 				info.garbage -= Witdh;
 			}
 
+			const auto chain = info.field.useSkill();
+			info.score += chain.score;
+			info.diffScore += chain.score;
+			info.garbage -= chain.garbage;
+			info.gauge = 0;
+
 			return chain;
 		}
 		else
 		{
+			if (info.garbage >= Witdh)
+			{
+				info.field.dropGarbage();
+				info.garbage -= Witdh;
+			}
+
 			const auto chain = info.field.dropPack(packs[turn], com);
 			info.score += chain.score;
 			info.diffScore += chain.score;
@@ -70,12 +76,6 @@ private:
 			if (chain.chain > 0)
 			{
 				info.gauge += GaugeAdd;
-			}
-
-			if (info.garbage >= Witdh)
-			{
-				info.field.dropGarbage();
-				info.garbage -= Witdh;
 			}
 
 			return chain;
