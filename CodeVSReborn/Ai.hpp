@@ -254,6 +254,27 @@ public:
 						}
 					}
 
+					if (top.info.gauge >= SkillCost)
+					{
+						auto next = top;
+
+						next.com[t] = Command(true);
+
+						const auto chain = next.info.simulation(next.com[t], packs[turn]);
+
+						if (top.info.field.isSurvival())
+						{
+							int ign = top.eval.getIgnition();
+
+							if (turn > ign)
+								ign += Config::Ignition;
+
+							next.eval = Evaluation(next.info, chain, top.eval, turn, ign);
+
+							qData[t + 1].push(std::move(next));
+						}
+					}
+
 					qData[t].pop();
 				}
 			}

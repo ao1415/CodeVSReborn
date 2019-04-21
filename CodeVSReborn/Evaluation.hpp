@@ -8,14 +8,14 @@ namespace Config {
 
 
 	/// <summary>探査ターン数</summary>
-	constexpr int Turn = 10;
+	constexpr int Turn = 15;
 	/// <summary>探査時のビーム幅</summary>
 	constexpr int Chokudai = 3;
 	/// <summary>探査時間</summary>
 	constexpr int ThinkTime = 1000;
 
 	/// <summary>発火ターン数</summary>
-	constexpr int Ignition = 10;
+	constexpr int Ignition = 15;
 	/// <summary>発火ターンのずれ</summary>
 	constexpr int IgnitionDev = 3;
 	constexpr std::array<double, IgnitionDev> IgnitionRate{ 1.5,1.3,1.1 };
