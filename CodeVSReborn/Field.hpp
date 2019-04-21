@@ -368,9 +368,6 @@ public:
 			std::cin.ignore();
 		}
 
-		std::string end;
-		std::cin >> end;
-
 		field.setElevation();
 
 		return std::move(field);

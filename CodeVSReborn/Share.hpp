@@ -14,7 +14,7 @@ struct PlayerInfo {
 	int diffScore = 0;
 	Field field;
 
-	void input() {
+	bool input() {
 
 		int s = score;
 
@@ -24,7 +24,12 @@ struct PlayerInfo {
 		std::cin >> score;
 		field = Field::Creat();
 
+		std::string end;
+		std::cin >> end;
+
 		diffScore = score - s;
+
+		return end == "END";
 	}
 
 	void debug() const {
@@ -64,13 +69,15 @@ public:
 		}
 	}
 
-	void loop() {
+	bool loop() {
 
 		std::cin >> m_turn;
 
-		m_my.input();
-		m_enemy.input();
+		bool check = true;
+		check &= m_my.input();
+		check &= m_enemy.input();
 
+		return check;
 	}
 
 	static void Create() { instance.reset(new Share()); }

@@ -5,10 +5,13 @@
 #include "Field.hpp"
 #include "Share.hpp"
 
-struct Data {
+const static int Turn = 10;
+const static int Chokudai = 3;
+const static int ThinkTime = 1000;
 
-	const static int Turn = 10;
-	const static int Chokudai = 3;
+const static int EnemyThinkTurn = 2;
+
+struct Data {
 
 	PlayerInfo info;
 	std::array<Command, Turn> com;
@@ -99,7 +102,7 @@ private:
 			qData.push(now);
 		}
 
-		for (int t = 0; t < 2; t++)
+		for (int t = 0; t < EnemyThinkTurn; t++)
 		{
 			if (turn + t >= MaxTurn) break;
 
@@ -173,7 +176,7 @@ public:
 		enemyData.info.debug();
 		//enemyData.info.field.debug();
 
-		std::array<std::priority_queue<Data>, Data::Turn + 1> qData;
+		std::array<std::priority_queue<Data>, Turn + 1> qData;
 
 		{
 			Data now;
@@ -183,20 +186,20 @@ public:
 		}
 
 		Timer timer;
-		timer.set(std::chrono::milliseconds(1200));
+		timer.set(std::chrono::milliseconds(ThinkTime));
 
 		long long int loop = 0;
 
 		timer.start();
 		while (!timer)
 		{
-			for (int t = 0; t < Data::Turn; t++)
+			for (int t = 0; t < Turn; t++)
 			{
 				const int turn = baseTurn + t;
 
 				if (turn >= MaxTurn) break;
 
-				for (int i = 0; i < Data::Chokudai; i++)
+				for (int i = 0; i < Chokudai; i++)
 				{
 					if (qData[t].empty()) break;
 
@@ -237,7 +240,7 @@ public:
 
 		std::cerr << "loop:" << loop << std::endl;
 
-		for (int i = Data::Turn - 1; i >= 0; i--)
+		for (int i = Turn - 1; i >= 0; i--)
 		{
 			if (!qData[i].empty())
 			{

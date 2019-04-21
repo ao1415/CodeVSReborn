@@ -4,15 +4,9 @@
 
 std::shared_ptr<Share> Share::instance;
 
-int main() {
+void run() {
 
-	Share::Create();
 	auto share = Share::Get();
-
-
-	std::cout << "ao1415" << std::endl;
-	std::cout.flush();
-
 	share->first();
 
 	Stopwatch sw;
@@ -20,7 +14,8 @@ int main() {
 
 	for (int i = 0; i < MaxTurn; i++)
 	{
-		share->loop();
+		if (!share->loop())
+			break;
 
 		std::cerr << "turn:" << std::setw(3) << share->turn() << "================" << std::endl;
 		sw.start();
@@ -34,6 +29,19 @@ int main() {
 		std::cout.flush();
 	}
 
+}
+
+int main() {
+
+	Share::Create();
+
+
+	std::cout << "ao1415" << std::endl;
+	std::cout.flush();
+
+	std::cerr << sizeof(Field) << std::endl;
+
+	run();
 
 	return 0;
 }
