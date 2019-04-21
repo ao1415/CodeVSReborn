@@ -3,6 +3,7 @@
 #include "Ai.hpp"
 
 std::shared_ptr<Share> Share::instance;
+std::shared_ptr<Random> Random::instance;
 
 void run() {
 
@@ -34,12 +35,10 @@ void run() {
 int main() {
 
 	Share::Create();
-
+	Random::Create();
 
 	std::cout << "ao1415" << std::endl;
 	std::cout.flush();
-
-	std::cerr << sizeof(Field) << std::endl;
 
 	run();
 

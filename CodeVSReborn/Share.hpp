@@ -32,14 +32,61 @@ struct PlayerInfo {
 		return end == "END";
 	}
 
-	void debug() const {
+	void debug(const std::string& title = "PlayerInfo") const {
 
-		std::cerr << "PlayerInfo" << std::endl;
+		std::cerr << title << std::endl;
 		std::cerr << "time   :" << time << std::endl;
 		std::cerr << "garbage:" << garbage << std::endl;
 		std::cerr << "gauge  :" << gauge << std::endl;
 		std::cerr << "score  :" << score << std::endl;
 
+	}
+
+	Chain simulation(const Command& com, const Pack& pack) {
+
+		if (com.skill)
+		{
+			if (garbage >= Witdh)
+			{
+				field.dropGarbage();
+				garbage -= Witdh;
+			}
+
+			const auto chain = field.useSkill();
+			score += chain.score;
+			diffScore += chain.score;
+			garbage -= chain.garbage;
+			gauge = 0;
+
+			return chain;
+		}
+		else
+		{
+			if (garbage >= Witdh)
+			{
+				field.dropGarbage();
+				garbage -= Witdh;
+			}
+
+			const auto chain = field.dropPack(pack, com);
+			score += chain.score;
+			diffScore += chain.score;
+			garbage -= chain.garbage;
+
+			if (chain.chain > 0)
+			{
+				gauge = std::min(gauge + GaugeAdd, MaxGauge);
+			}
+
+			return chain;
+		}
+
+	}
+
+	//PlayerInfo& operator=(const PlayerInfo&) = delete;
+
+	PlayerInfo copy() const {
+		return PlayerInfo(*this);
 	}
 
 };
@@ -96,5 +143,29 @@ public:
 	const inline PlayerInfo& my() const { return m_my; }
 	[[nodiscard]]
 	const inline PlayerInfo& enemy() const { return m_enemy; }
+
+};
+
+class Random {
+private:
+
+	Random() {
+		std::random_device rnd;
+		mt.seed(rnd());
+	}
+
+	static std::shared_ptr<Random> instance;
+
+	std::uniform_real_distribution<> range{ 0.0, 1.0 };
+	std::mt19937 mt;
+
+public:
+
+	static void Create() { instance.reset(new Random()); }
+	[[nodiscard]]
+	static const std::shared_ptr<Random> Get() { return instance; }
+
+	[[nodiscard]]
+	double swing() { return range(mt); }
 
 };

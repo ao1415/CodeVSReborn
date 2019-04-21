@@ -9,8 +9,6 @@ private:
 	FieldArray table;
 	std::array<Num, Witdh> elevation;
 
-	bool survival = true;
-
 	void setElevation() {
 
 		elevation.fill(Height - 1);
@@ -114,12 +112,6 @@ private:
 		return isErase;
 	}
 
-	void checkDangerLine() {
-		survival = !std::any_of(elevation.cbegin(), elevation.cend(), [](int x) {
-			return x <= DangerLine;
-		});
-	}
-
 	const Chain bombBlock(std::array<Num, Witdh>& recalc) {
 
 		const Num BombNumber = 5;
@@ -215,8 +207,6 @@ private:
 			fallBlock(recalc);
 		}
 
-		checkDangerLine();
-
 		return Chain(chain, score, score / 2);
 	}
 
@@ -302,7 +292,6 @@ public:
 
 		//debug();
 
-		checkDangerLine();
 		return chain;
 	}
 
@@ -319,7 +308,6 @@ public:
 
 		//debug();
 
-		checkDangerLine();
 		return bomb + chain;
 	}
 
@@ -336,7 +324,11 @@ public:
 	[[nodiscard]]
 	const FieldArray& getFieldArray() const { return table; }
 	[[nodiscard]]
-	const bool isSurvival() const { return survival; }
+	const bool isSurvival() const {
+		return !std::any_of(elevation.cbegin(), elevation.cend(), [](int x) {
+			return x <= DangerLine;
+		});
+	}
 
 
 	//[[deprecated("used for debug only")]]

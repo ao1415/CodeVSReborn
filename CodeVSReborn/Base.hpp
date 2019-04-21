@@ -30,6 +30,7 @@ constexpr int Witdh = 10;
 constexpr int Height = 16 + DangerLine;
 
 constexpr int MaxTurn = 500;
+constexpr int MaxGauge = 100;
 constexpr int PackSize = 2;
 
 constexpr int PackDropRange = 9;
@@ -53,17 +54,17 @@ struct Command {
 	int rotate = 0;
 	bool skill = false;
 
-	Command() : Command(0, 0, false) {}
-	Command(int p, int r) : Command(p, r, false) {}
-	Command(bool s) : Command(0, 0, s) {}
-	Command(int p, int r, bool s) {
+	constexpr Command() : Command(0, 0, false) {}
+	constexpr Command(int p, int r) : Command(p, r, false) {}
+	constexpr Command(bool s) : Command(0, 0, s) {}
+	constexpr Command(int p, int r, bool s) {
 		pos = p;
 		rotate = r;
 		skill = s;
 	}
 
 	[[nodiscard]]
-	std::string toString() const {
+	const std::string toString() const {
 
 		if (!skill)
 			return std::to_string(pos) + " " + std::to_string(rotate);
