@@ -36,10 +36,17 @@ public:
 		PackArray basePack;
 		std::string end;
 
-		std::cin >> basePack[0][0] >> basePack[0][1];
-		std::cin >> basePack[1][0] >> basePack[1][1];
+		int p1, p2;
+		int p3, p4;
+		std::cin >> p1 >> p2;
+		std::cin >> p3 >> p4;
 
 		std::cin >> end;
+
+		basePack[0][0] = static_cast<Num>(p1);
+		basePack[0][1] = static_cast<Num>(p2);
+		basePack[1][0] = static_cast<Num>(p3);
+		basePack[1][1] = static_cast<Num>(p4);
 
 		pack.packs[0] = basePack;
 		pack.packs[1] = pack.rotate(pack.packs[0]);
