@@ -32,40 +32,26 @@ private:
 	double score = 0;
 	int ignition = 0;
 
-	std::pair<Chain, double> maxChain(const PlayerInfo& info, const int turn, const int ignition) {
+	Chain maxChain(const PlayerInfo& info) {
 
 		const auto& packs = Share::Get()->packs();
-
-		//—¼’[‚Ì‚Ý•]‰¿
-		constexpr std::array<Command, 8> coms{
-			Command(0,0),Command(0,1),Command(0,2),Command(0,3),
-			Command(PackDropRange - 1,0),Command(PackDropRange - 1,1),Command(PackDropRange - 1,2),Command(PackDropRange - 1,3)
-		};
 
 		Chain max;
 		double chainScore = 0.0;
 
-		for (int t = 0; t < 3; t++)
+		for (int num = 1; num <= 9; num++)
 		{
-			if (turn + t >= MaxTurn) break;
+			auto next = info.copy();
+			auto chain = next.field.dropCell(num);
 
-			for (const auto& com : coms)
+			if (max.score < chain.score)
 			{
-				auto next = info.copy();
-				auto chain = next.simulation(com, packs[ignition + t]);
-
-				const double score = chain.score*Config::IgnitionRate[t];
-
-				if (max.score < score)
-				{
-					max = chain;
-					chainScore = score;
-					this->ignition = ignition + t;
-				}
+				max = chain;
+				chainScore = score;
 			}
 		}
 
-		return std::make_pair(max, chainScore);
+		return max;
 	}
 
 public:
@@ -77,17 +63,12 @@ public:
 
 		this->ignition = ignition;
 
-		//const auto[chain, chainScore] = maxChain(info, turn, ignition);
+		const auto potentialChain = maxChain(info);
 
 		score = prev.score;
+		score += chain.score;
 
-		const int dt = turn - ignition;
-		if (0 <= dt && dt < 3)
-			score += chain.score*Config::IgnitionRate[dt];
-		else
-			score += chain.score;
-
-		score += chain.chain * 10;
+		score += potentialChain.score * 2;
 
 		score += random->swing();
 	}

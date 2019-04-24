@@ -7,6 +7,9 @@ class Field {
 private:
 
 	FieldArray table;
+
+	using CheckLine = std::bitset<Witdh>;
+
 	std::array<Num, Witdh> elevation;
 
 	void setElevation() {
@@ -26,84 +29,88 @@ private:
 
 	}
 
-	bool eraseBlock(std::array<Num, Witdh>& recalc) {
+	bool eraseBlock(CheckLine& recalc) {
 
 		BitFieldArray bitField(false);
 
 		for (int x = 0; x < Witdh; x++)
 		{
-			for (int y = recalc[x]; y > elevation[x]; y--)
+			if (recalc[x])
 			{
-				//上
+				for (int y = Height - 1; y > elevation[x]; y--)
 				{
-					int px = x + 0; int py = y - 1;
-
-					const int sum = table[y][x] + table[py][px];
-					if (sum == Elimination)
-						bitField[y][x] = bitField[py][px] = true;
-				}
-
-				//右
-				{
-					int px = x + 1; int py = y - 0;
-
-					if (px < Witdh)
+					//上
 					{
+						int px = x + 0; int py = y - 1;
+
 						const int sum = table[y][x] + table[py][px];
 						if (sum == Elimination)
 							bitField[y][x] = bitField[py][px] = true;
 					}
-				}
 
-				//右上
-				{
-					int px = x + 1; int py = y - 1;
-
-					if (px < Witdh)
+					//右
 					{
-						const int sum = table[y][x] + table[py][px];
-						if (sum == Elimination)
-							bitField[y][x] = bitField[py][px] = true;
+						int px = x + 1; int py = y - 0;
+
+						if (px < Witdh)
+						{
+							const int sum = table[y][x] + table[py][px];
+							if (sum == Elimination)
+								bitField[y][x] = bitField[py][px] = true;
+						}
 					}
-				}
 
-				//左上
-				{
-					int px = x - 1; int py = y - 1;
-
-					if (0 <= px)
+					//右上
 					{
-						const int sum = table[y][x] + table[py][px];
-						if (sum == Elimination)
-							bitField[y][x] = bitField[py][px] = true;
+						int px = x + 1; int py = y - 1;
+
+						if (px < Witdh)
+						{
+							const int sum = table[y][x] + table[py][px];
+							if (sum == Elimination)
+								bitField[y][x] = bitField[py][px] = true;
+						}
+					}
+
+					//左上
+					{
+						int px = x - 1; int py = y - 1;
+
+						if (0 <= px)
+						{
+							const int sum = table[y][x] + table[py][px];
+							if (sum == Elimination)
+								bitField[y][x] = bitField[py][px] = true;
+						}
 					}
 				}
 			}
 		}
 
-		const auto diff = recalc;
-		recalc = elevation;
+		const auto prev = recalc;
+		recalc.reset();
 
 		bool isErase = false;
 		for (int x = 0; x < Witdh; x++)
 		{
 			bool update = false;
-			for (int y = diff[x]; y > elevation[x]; y--)
+			if (prev[x])
 			{
-				if (bitField[y][x])
+				for (int y = Height - 1; y > elevation[x]; y--)
 				{
-					table[y][x] = Empty;
-					isErase = true;
-
-					if (!update)
+					if (bitField[y][x])
 					{
-						int low = std::min(y + 1, Height - 1);
-						recalc[x - 0] = std::max(recalc[x - 0], low);
-						if (0 <= x - 1)
-							recalc[x - 1] = std::max(recalc[x - 1], low);
-						if (x + 1 < Witdh)
-							recalc[x + 1] = std::max(recalc[x + 1], low);
-						update = true;
+						table[y][x] = Empty;
+						isErase = true;
+
+						if (!update)
+						{
+							recalc.set(x);
+							if (0 <= x - 1) recalc.set(x - 1);
+							if (x + 1 < Witdh) recalc.set(x + 1);
+
+							update = true;
+						}
 					}
 				}
 			}
@@ -112,7 +119,7 @@ private:
 		return isErase;
 	}
 
-	const Chain bombBlock(std::array<Num, Witdh>& recalc) {
+	const Chain bombBlock(CheckLine& recalc) {
 
 		const Num BombNumber = 5;
 
@@ -165,6 +172,7 @@ private:
 		}
 
 		int disBlock = 0;
+		recalc.reset();
 		for (int x = 0; x < Witdh; x++)
 		{
 			bool update = false;
@@ -177,12 +185,10 @@ private:
 
 					if (!update)
 					{
-						int low = std::min(y + 1, Height - 1);
-						recalc[x - 0] = std::max(recalc[x - 0], low);
-						if (0 <= x - 1)
-							recalc[x - 1] = std::max(recalc[x - 1], low);
-						if (x + 1 < Witdh)
-							recalc[x + 1] = std::max(recalc[x + 1], low);
+						recalc.set(x);
+						if (0 <= x - 1) recalc.set(x - 1);
+						if (x + 1 < Witdh) recalc.set(x + 1);
+
 						update = true;
 					}
 				}
@@ -195,57 +201,62 @@ private:
 
 		return Chain(0, score, score / 2);
 	}
-	const Chain chainBlock(std::array<Num, Witdh>& recalc) {
+	const Chain chainBlock(CheckLine& recalc) {
 
 		int score = 0;
 		int chain = 0;
+		double pow = 1.0;
 
 		while (eraseBlock(recalc))
 		{
 			chain++;
-			score += static_cast<int>(std::pow(1.3, chain));
+			pow *= 1.3;
+			score += static_cast<int>(pow);
 			fallBlock(recalc);
 		}
 
 		return Chain(chain, score, score / 2);
 	}
 
-	void fallBlock(std::array<Num, Witdh>& recalc) {
+	void fallBlock(CheckLine& recalc) {
 
 		for (int x = 0; x < Witdh; x++)
 		{
 			const int h = elevation[x];
-			int index = recalc[x];
 
-			for (int y = index; y > h; y--)
+			if (recalc[x])
 			{
-				if (table[y][x] != Empty)
+				int index = Height - 1;
+				for (int y = index; y > h; y--)
 				{
-					if (index != y)
+					if (table[y][x] != Empty)
 					{
-						table[index][x] = table[y][x];
-						table[y][x] = Empty;
+						if (index != y)
+						{
+							table[index][x] = table[y][x];
+							table[y][x] = Empty;
+						}
+						index--;
 					}
-					index--;
 				}
+				elevation[x] = index;
 			}
-			elevation[x] = index;
 		}
 
 	}
 
-	void setPack(const Pack& pack, const Command& command, std::array<Num, Witdh>& recalc) {
+	void setPack(const Pack& pack, const Command& command, CheckLine& recalc) {
 
 		const auto& pos = command.pos;
 		const auto& r = command.rotate;
 
-		int right = std::min(pos + 2, Witdh - 1);
 		int left = std::max(0, pos - 1);
+		int right = std::min(pos + 2, Witdh - 1);
 
-		recalc[right] = std::min(elevation[right] + 1, Height - 1);
-		recalc[left] = std::min(elevation[left] + 1, Height - 1);
-		recalc[pos + 0] = std::min(elevation[pos + 0] + 1, Height - 1);
-		recalc[pos + 1] = std::min(elevation[pos + 1] + 1, Height - 1);
+		recalc.set(left);
+		recalc.set(pos + 0);
+		recalc.set(pos + 1);
+		recalc.set(right);
 
 		if (pack[r][1][0] != Empty)
 		{
@@ -284,7 +295,7 @@ public:
 	[[nodiscard]]
 	const Chain dropPack(const Pack& pack, const Command& command) {
 
-		auto recalc = elevation;
+		CheckLine recalc(false);
 
 		setPack(pack, command, recalc);
 
@@ -298,7 +309,7 @@ public:
 	[[nodiscard]]
 	const Chain useSkill() {
 
-		auto recalc = elevation;
+		CheckLine recalc(false);
 
 		const auto bomb = bombBlock(recalc);
 
@@ -309,6 +320,27 @@ public:
 		//debug();
 
 		return bomb + chain;
+	}
+
+	const Chain dropCell(const int num) {
+
+		CheckLine recalc(false);
+
+		constexpr int pos = 2;
+
+		constexpr int left = std::max(0, pos - 1);
+		constexpr int right = std::min(pos + 1, Witdh - 1);
+
+		recalc.set(right);
+		recalc.set(pos);
+		recalc.set(left);
+
+		table[elevation[pos]][pos] = num;
+		elevation[pos]--;
+
+		const auto chain = chainBlock(recalc);
+
+		return chain;
 	}
 
 	void dropGarbage() {
@@ -355,7 +387,9 @@ public:
 		{
 			for (int x = 0; x < Witdh; x++)
 			{
-				std::cin >> field.table[y][x];
+				int num;
+				std::cin >> num;
+				field.table[y][x] = static_cast<Num>(num);
 			}
 			std::cin.ignore();
 		}

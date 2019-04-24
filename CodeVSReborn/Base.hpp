@@ -8,6 +8,7 @@
 
 #include <array>
 #include <vector>
+#include <bitset>
 
 #include <stack>
 #include <queue>
@@ -22,7 +23,7 @@
 #include "FixedGrid.hpp"
 #include "Clock.hpp"
 
-using Num = int;
+using Num = char;
 
 constexpr int DangerLine = 3;
 
