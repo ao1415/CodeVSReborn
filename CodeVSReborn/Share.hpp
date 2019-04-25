@@ -46,10 +46,10 @@ struct PlayerInfo {
 
 		if (com.skill)
 		{
-			if (garbage >= Witdh)
+			if (garbage >= Width)
 			{
 				field.dropGarbage();
-				garbage -= Witdh;
+				garbage -= Width;
 			}
 
 			const auto chain = field.useSkill();
@@ -62,10 +62,10 @@ struct PlayerInfo {
 		}
 		else
 		{
-			if (garbage >= Witdh)
+			if (garbage >= Width)
 			{
 				field.dropGarbage();
-				garbage -= Witdh;
+				garbage -= Width;
 			}
 
 			const auto chain = field.dropPack(pack, com);

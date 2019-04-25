@@ -27,7 +27,7 @@ using Num = char;
 
 constexpr int DangerLine = 3;
 
-constexpr int Witdh = 10;
+constexpr int Width = 10;
 constexpr int Height = 16 + DangerLine;
 
 constexpr int MaxTurn = 500;
@@ -47,8 +47,8 @@ constexpr Num Garbage = 11;
 const std::string Skill = "S";
 
 using PackArray = FixedGrid<Num, PackSize, PackSize>;
-using FieldArray = FixedGrid<Num, Witdh, Height>;
-using BitFieldArray = FixedGrid<bool, Witdh, Height>;
+using FieldArray = FixedGrid<Num, Width, Height>;
+using BitFieldArray = FixedGrid<bool, Width, Height>;
 
 struct Command {
 	int pos = 0;
@@ -107,5 +107,5 @@ struct Chain {
 };
 
 inline bool _inside(const int& v, const int& max) { return (0 <= v && v < max); }
-inline bool inside(const int& x, const int& y) { return (_inside(x, Witdh) && _inside(y, Height)); }
+inline bool inside(const int& x, const int& y) { return (_inside(x, Width) && _inside(y, Height)); }
 inline bool inside(const std::pair<int, int>& pos) { return inside(pos.first, pos.second); }

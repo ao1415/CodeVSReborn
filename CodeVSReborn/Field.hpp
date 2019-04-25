@@ -3,19 +3,45 @@
 #include "Base.hpp"
 #include "Pack.hpp"
 
+constexpr std::array<std::bitset<Width>, Width> LineColumn
+{
+	0b1100000000,
+	0b1110000000,
+	0b0111000000,
+	0b0011100000,
+	0b0001110000,
+	0b0000111000,
+	0b0000011100,
+	0b0000001110,
+	0b0000000111,
+	0b0000000011
+};
+constexpr std::array<std::bitset<Width>, PackDropRange> PackColumn
+{
+	0b1110000000,
+	0b1111000000,
+	0b0111100000,
+	0b0011110000,
+	0b0001111000,
+	0b0000111100,
+	0b0000011110,
+	0b0000001111,
+	0b0000000111
+};
+
 class Field {
 private:
 
 	FieldArray table;
 
-	using CheckLine = std::bitset<Witdh>;
+	using CheckLine = std::bitset<Width>;
 
-	std::array<Num, Witdh> elevation;
+	std::array<Num, Width> elevation;
 
 	void setElevation() {
 
 		elevation.fill(Height - 1);
-		for (int x = 0; x < Witdh; x++)
+		for (int x = 0; x < Width; x++)
 		{
 			for (int y = DangerLine; y < Height; y++)
 			{
@@ -33,7 +59,7 @@ private:
 
 		BitFieldArray bitField(false);
 
-		for (int x = 0; x < Witdh; x++)
+		for (int x = 0; x < Width; x++)
 		{
 			if (recalc[x])
 			{
@@ -52,7 +78,7 @@ private:
 					{
 						int px = x + 1; int py = y - 0;
 
-						if (px < Witdh)
+						if (px < Width)
 						{
 							const int sum = table[y][x] + table[py][px];
 							if (sum == Elimination)
@@ -64,7 +90,7 @@ private:
 					{
 						int px = x + 1; int py = y - 1;
 
-						if (px < Witdh)
+						if (px < Width)
 						{
 							const int sum = table[y][x] + table[py][px];
 							if (sum == Elimination)
@@ -88,10 +114,8 @@ private:
 		}
 
 		const auto prev = recalc;
-		recalc.reset();
 
-		bool isErase = false;
-		for (int x = 0; x < Witdh; x++)
+		for (int x = 0; x < Width; x++)
 		{
 			bool update = false;
 			if (prev[x])
@@ -101,22 +125,15 @@ private:
 					if (bitField[y][x])
 					{
 						table[y][x] = Empty;
-						isErase = true;
 
-						if (!update)
-						{
-							recalc.set(x);
-							if (0 <= x - 1) recalc.set(x - 1);
-							if (x + 1 < Witdh) recalc.set(x + 1);
-
-							update = true;
-						}
+						update = true;
 					}
 				}
+				recalc.set(x, update);
 			}
 		}
 
-		return isErase;
+		return recalc.any();
 	}
 
 	const Chain bombBlock(CheckLine& recalc) {
@@ -131,7 +148,7 @@ private:
 
 		for (int y = 0; y < Height; y++)
 		{
-			for (int x = 0; x < Witdh; x++)
+			for (int x = 0; x < Width; x++)
 			{
 				if (table[y][x] == BombNumber)
 				{
@@ -172,8 +189,7 @@ private:
 		}
 
 		int disBlock = 0;
-		recalc.reset();
-		for (int x = 0; x < Witdh; x++)
+		for (int x = 0; x < Width; x++)
 		{
 			bool update = false;
 			for (int y = Height - 1; y > elevation[x]; y--)
@@ -183,16 +199,10 @@ private:
 					table[y][x] = Empty;
 					disBlock++;
 
-					if (!update)
-					{
-						recalc.set(x);
-						if (0 <= x - 1) recalc.set(x - 1);
-						if (x + 1 < Witdh) recalc.set(x + 1);
-
-						update = true;
-					}
+					update = true;
 				}
 			}
+			recalc.set(x, update);
 		}
 
 		int score = 0;
@@ -201,6 +211,7 @@ private:
 
 		return Chain(0, score, score / 2);
 	}
+
 	const Chain chainBlock(CheckLine& recalc) {
 
 		int score = 0;
@@ -220,12 +231,14 @@ private:
 
 	void fallBlock(CheckLine& recalc) {
 
-		for (int x = 0; x < Witdh; x++)
-		{
-			const int h = elevation[x];
+		const auto prev = recalc;
+		recalc.reset();
 
-			if (recalc[x])
+		for (int x = 0; x < Width; x++)
+		{
+			if (prev[x])
 			{
+				const int h = elevation[x];
 				int index = Height - 1;
 				for (int y = index; y > h; y--)
 				{
@@ -240,6 +253,7 @@ private:
 					}
 				}
 				elevation[x] = index;
+				recalc |= LineColumn[x];
 			}
 		}
 
@@ -250,13 +264,7 @@ private:
 		const auto& pos = command.pos;
 		const auto& r = command.rotate;
 
-		int left = std::max(0, pos - 1);
-		int right = std::min(pos + 2, Witdh - 1);
-
-		recalc.set(left);
-		recalc.set(pos + 0);
-		recalc.set(pos + 1);
-		recalc.set(right);
+		recalc = PackColumn[pos];
 
 		if (pack[r][1][0] != Empty)
 		{
@@ -328,12 +336,7 @@ public:
 
 		constexpr int pos = 2;
 
-		constexpr int left = std::max(0, pos - 1);
-		constexpr int right = std::min(pos + 1, Witdh - 1);
-
-		recalc.set(right);
-		recalc.set(pos);
-		recalc.set(left);
+		recalc = LineColumn[pos];
 
 		table[elevation[pos]][pos] = num;
 		elevation[pos]--;
@@ -345,7 +348,7 @@ public:
 
 	void dropGarbage() {
 
-		for (int x = 0; x < Witdh; x++)
+		for (int x = 0; x < Width; x++)
 		{
 			table[elevation[x]][x] = Garbage;
 			elevation[x]--;
@@ -368,7 +371,7 @@ public:
 
 		for (int y = 0; y < Height; y++)
 		{
-			for (int x = 0; x < Witdh; x++)
+			for (int x = 0; x < Width; x++)
 			{
 				//std::cerr << (table[y][x] < Elimination ? std::to_string(table[y][x]) : "#") << " ";
 				std::cerr << table[y][x] << " ";
@@ -385,7 +388,7 @@ public:
 
 		for (int y = DangerLine; y < Height; y++)
 		{
-			for (int x = 0; x < Witdh; x++)
+			for (int x = 0; x < Width; x++)
 			{
 				int num;
 				std::cin >> num;
