@@ -236,98 +236,67 @@ private:
 	}
 
 	const Chain bombBlock(CheckLine& recalc) {
-
+		
 		const Num BombNumber = 5;
 
-		BitTable bombTable(false);
-		BitTable blockTable(false);
+		BitFieldArray bitField(false);
 
-		//ビットボードの作成
-		for (int x = Width - 1; x >= 0; x--)
+		//横・右下・下・左下
+		int dx[] = { 1,1,0,-1 };
+		int dy[] = { 0,1,1,1 };
+
+		for (int y = 0; y < Height; y++)
 		{
-			BitTable bombLine(false);
-			BitTable blockLine(false);
-
-			for (int y = 0; y < Height; y++)
+			for (int x = 0; x < Width; x++)
 			{
 				if (table[y][x] == BombNumber)
 				{
-					bombLine |= BlockTable[y];
+					bitField[y][x] = true;
+					for (int d = 0; d < 4; d++)
+					{
+						int px = x + dx[d];
+						int py = y + dy[d];
+
+						if (inside(px, py))
+						{
+							if (table[py][px] != Garbage && table[py][px] != Empty)
+							{
+								bitField[py][px] = true;
+							}
+						}
+					}
 				}
-				else if (table[y][x] != Empty && table[y][x] != Garbage)
+				else if (table[y][x] != Garbage && table[y][x] != Empty)
 				{
-					blockLine |= BlockTable[y];
+					for (int d = 0; d < 4; d++)
+					{
+						int px = x + dx[d];
+						int py = y + dy[d];
+
+						if (inside(px, py))
+						{
+							if (table[py][px] == BombNumber)
+							{
+								bitField[y][x] = true;
+								bitField[py][px] = true;
+								break;
+							}
+						}
+					}
 				}
 			}
-
-			bombTable <<= Height;
-			bombTable |= bombLine;
-
-			blockTable <<= Height;
-			blockTable |= blockLine;
 		}
 
-		BitTable bombBoard(false);
-		
-		bombBoard |= bombTable;
-		//上
-		{
-			auto sentinel = bombTable & BlockSentinel[0];
-			auto bomb = blockTable & (sentinel >> 1);
-			bombBoard |= bomb;
-		}
-		//下
-		{
-			auto sentinel = bombTable & BlockSentinel[1];
-			auto bomb = blockTable & (sentinel << 1);
-			bombBoard |= bomb;
-		}
-		//右
-		{
-			auto sentinel = bombTable & BlockSentinel[2];
-			auto bomb = blockTable & (sentinel >> Height);
-			bombBoard |= bomb;
-		}
-		//左
-		{
-			auto sentinel = bombTable & BlockSentinel[3];
-			auto bomb = blockTable & (sentinel << Height);
-			bombBoard |= bomb;
-		}
-		//右上
-		{
-			auto sentinel = bombTable & BlockSentinel[4];
-			auto bomb = blockTable & (sentinel >> Height + 1);
-			bombBoard |= bomb;
-		}
-		//右下
-		{
-			auto sentinel = bombTable & BlockSentinel[5];
-			auto bomb = blockTable & (sentinel >> Height - 1);
-			bombBoard |= bomb;
-		}
-		//左上
-		{
-			auto sentinel = bombTable & BlockSentinel[6];
-			auto bomb = blockTable & (sentinel << Height - 1);
-			bombBoard |= bomb;
-		}
-		//左下
-		{
-			auto sentinel = bombTable & BlockSentinel[7];
-			auto bomb = blockTable & (sentinel << Height + 1);
-			bombBoard |= bomb;
-		}
-
-		int disBlock = static_cast<int>(bombBoard.count());
+		int disBlock = 0;
 		for (int x = 0; x < Width; x++)
 		{
 			bool update = false;
 			for (int y = Height - 1; y > elevation[x]; y--)
 			{
-				if (bombBoard[y + x * Height])
+				if (bitField[y][x])
 				{
 					table[y][x] = Empty;
+					disBlock++;
 
 					update = true;
 				}

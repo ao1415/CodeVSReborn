@@ -32,6 +32,27 @@ void run() {
 
 }
 
+void test() {
+
+	PlayerInfo base;
+	base.field = Field::Creat();
+
+	Stopwatch sw;
+
+	sw.start();
+	for (int i = 0; i < 100000; i++)
+	{
+		auto test = base.copy();
+
+		test.simulation(Command(true), Pack());
+
+	}
+	sw.stop();
+
+	std::cerr << sw.toString_ms() << std::endl;
+
+}
+
 int main() {
 
 	Share::Create();
@@ -41,6 +62,7 @@ int main() {
 	std::cout.flush();
 
 	run();
+	//test();
 
 	return 0;
 }
