@@ -12,7 +12,7 @@ namespace Config {
 	/// <summary>探査時のビーム幅</summary>
 	constexpr int Chokudai = 3;
 	/// <summary>探査時間</summary>
-	constexpr int ThinkTime = 1000;
+	constexpr int ThinkTime = 3000;
 
 	/// <summary>発火ターン数</summary>
 	constexpr int Ignition = 15;

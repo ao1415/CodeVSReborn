@@ -204,9 +204,9 @@ public:
 
 		const auto enemyData = enemyThink();
 
-		enemyData.chain.debug();
+		//enemyData.chain.debug();
 		enemyData.info.debug();
-		enemyData.info.field.debug();
+		//enemyData.info.field.debug();
 
 		Timer timer;
 		timer.set(std::chrono::milliseconds(Config::ThinkTime));
