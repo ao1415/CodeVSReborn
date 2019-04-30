@@ -61,8 +61,8 @@ int main() {
 	std::cout << "ao1415" << std::endl;
 	std::cout.flush();
 
-	run();
-	//test();
+	//run();
+	test();
 
 	return 0;
 }

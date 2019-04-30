@@ -52,6 +52,28 @@ constexpr std::array<BitTable, Height> BlockTable
 	0x00020000,
 	0x00040000
 };
+constexpr std::array<int, Height> BlockTableInteger
+{
+	0x00000001,
+	0x00000002,
+	0x00000004,
+	0x00000008,
+	0x00000010,
+	0x00000020,
+	0x00000040,
+	0x00000080,
+	0x00000100,
+	0x00000200,
+	0x00000400,
+	0x00000800,
+	0x00001000,
+	0x00002000,
+	0x00004000,
+	0x00008000,
+	0x00010000,
+	0x00020000,
+	0x00040000
+};
 const std::array<BitTable, 8> BlockSentinel
 {
 	//上
@@ -236,67 +258,98 @@ private:
 	}
 
 	const Chain bombBlock(CheckLine& recalc) {
-		
+
 		const Num BombNumber = 5;
 
-		BitFieldArray bitField(false);
+		BitTable bombTable(false);
+		BitTable blockTable(false);
 
-		//横・右下・下・左下
-		int dx[] = { 1,1,0,-1 };
-		int dy[] = { 0,1,1,1 };
-
-		for (int y = 0; y < Height; y++)
+		//ビットボードの作成
+		for (int x = Width - 1; x >= 0; x--)
 		{
-			for (int x = 0; x < Width; x++)
+			int bombLine(false);
+			int blockLine(false);
+
+			for (int y = 0; y < Height; y++)
 			{
 				if (table[y][x] == BombNumber)
 				{
-					bitField[y][x] = true;
-					for (int d = 0; d < 4; d++)
-					{
-						int px = x + dx[d];
-						int py = y + dy[d];
-
-						if (inside(px, py))
-						{
-							if (table[py][px] != Garbage && table[py][px] != Empty)
-							{
-								bitField[py][px] = true;
-							}
-						}
-					}
+					bombLine |= BlockTableInteger[y];
 				}
-				else if (table[y][x] != Garbage && table[y][x] != Empty)
+				else if (table[y][x] != Empty && table[y][x] != Garbage)
 				{
-					for (int d = 0; d < 4; d++)
-					{
-						int px = x + dx[d];
-						int py = y + dy[d];
-
-						if (inside(px, py))
-						{
-							if (table[py][px] == BombNumber)
-							{
-								bitField[y][x] = true;
-								bitField[py][px] = true;
-								break;
-							}
-						}
-					}
+					blockLine |= BlockTableInteger[y];
 				}
 			}
+
+			bombTable <<= Height;
+			bombTable |= bombLine;
+
+			blockTable <<= Height;
+			blockTable |= blockLine;
 		}
 
-		int disBlock = 0;
+		BitTable bombBoard(false);
+
+		bombBoard |= bombTable;
+		//上
+		{
+			auto sentinel = bombTable & BlockSentinel[0];
+			auto bomb = blockTable & (sentinel >> 1);
+			bombBoard |= bomb;
+		}
+		//下
+		{
+			auto sentinel = bombTable & BlockSentinel[1];
+			auto bomb = blockTable & (sentinel << 1);
+			bombBoard |= bomb;
+		}
+		//右
+		{
+			auto sentinel = bombTable & BlockSentinel[2];
+			auto bomb = blockTable & (sentinel >> Height);
+			bombBoard |= bomb;
+		}
+		//左
+		{
+			auto sentinel = bombTable & BlockSentinel[3];
+			auto bomb = blockTable & (sentinel << Height);
+			bombBoard |= bomb;
+		}
+		//右上
+		{
+			auto sentinel = bombTable & BlockSentinel[4];
+			auto bomb = blockTable & (sentinel >> Height + 1);
+			bombBoard |= bomb;
+		}
+		//右下
+		{
+			auto sentinel = bombTable & BlockSentinel[5];
+			auto bomb = blockTable & (sentinel >> Height - 1);
+			bombBoard |= bomb;
+		}
+		//左上
+		{
+			auto sentinel = bombTable & BlockSentinel[6];
+			auto bomb = blockTable & (sentinel << Height - 1);
+			bombBoard |= bomb;
+		}
+		//左下
+		{
+			auto sentinel = bombTable & BlockSentinel[7];
+			auto bomb = blockTable & (sentinel << Height + 1);
+			bombBoard |= bomb;
+		}
+
+		int disBlock = static_cast<int>(bombBoard.count());
 		for (int x = 0; x < Width; x++)
 		{
 			bool update = false;
 			for (int y = Height - 1; y > elevation[x]; y--)
 			{
-				if (bitField[y][x])
+				if (bombBoard[y + x * Height])
 				{
 					table[y][x] = Empty;
-					disBlock++;
 
 					update = true;
 				}
