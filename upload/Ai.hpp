@@ -33,8 +33,8 @@ class Ai {
 private:
 
 	std::array<Pack, MaxTurn> packs;
-	int ignition = Config::Ignition;
 	std::array<Command, Config::Turn> prevCom;
+	bool attackFlag = false;
 
 	[[nodiscard]]
 	EnemyData enemyThink(const int garbage = 0) {
@@ -141,6 +141,74 @@ private:
 		return EnemyData();
 	}
 
+	[[nodiscard]]
+	std::priority_queue<Data> attackThink(const EnemyData& enemy) {
+
+		const auto& share = *Share::Get();
+
+		const auto& turn = share.turn();
+		const auto& my = share.my();
+
+		Data now;
+		now.info = my.copy();
+
+		std::priority_queue<Data> attack;
+		std::priority_queue<Data> collect;
+
+		for (int pos = 0; pos < PackDropRange; pos++)
+		{
+			for (int rot = 0; rot < 4; rot++)
+			{
+				auto top = now;
+
+				top.com[0] = Command(pos, rot);
+
+				const auto chain = top.info.simulation(top.com[0], packs[turn]);
+
+				if (top.info.field.isSurvival())
+				{
+					if (chain.chain >= Config::ChainIgnition)
+					{
+						top.eval = Evaluation(top.info, chain, Evaluation(), turn);
+						attack.push(std::move(top));
+					}
+					else if (chain.chain <= Config::UselessChain)
+					{
+						top.eval = Evaluation(top.info, chain, Evaluation(), turn);
+						collect.push(std::move(top));
+					}
+				}
+			}
+		}
+
+		if (now.info.gauge >= SkillCost)
+		{
+			auto top = now;
+
+			top.com[0] = Command(true);
+
+			const auto chain = top.info.simulation(top.com[0], packs[turn]);
+
+			if (top.info.field.isSurvival())
+			{
+				if (chain.score >= Config::SkillIgnitionScore)
+				{
+					top.eval = Evaluation(top.info, chain, Evaluation(), turn);
+					attack.push(std::move(top));
+				}
+			}
+		}
+
+		attackFlag = false;
+		if (!attack.empty())
+		{
+			attackFlag = true;
+			return attack;
+		}
+
+		return collect;
+	}
+
 public:
 
 	Ai() {
@@ -159,18 +227,25 @@ public:
 		const auto& my = share.my();
 		const auto& enemy = share.enemy();
 
+		const auto& baseTime = my.time;
 		const auto& field = my.field;
 
 		std::array<std::priority_queue<Data>, Config::Turn + 1> qData;
 
+		const auto enemyData = enemyThink();
+
+		//enemyData.chain.debug();
+		//enemyData.info.debug();
+		//enemyData.info.field.debug();
+
+		auto attack = attackThink(enemyData);
+		qData[1].swap(attack);
+
+		//前回の最善手をセット
+		/*
+		if (!attackFlag)
 		{
-			Data now;
-			now.info = my.copy();
-
-			qData[0].push(std::move(now));
-
-			//前回の最善手をセット
-			for (int t = 0; t < Config::Turn - 1; t++)
+			for (int t = 1; t < Config::Turn - 1; t++)
 			{
 				const int turn = baseTurn + t;
 
@@ -189,27 +264,23 @@ public:
 
 					if (next.info.field.isSurvival())
 					{
-						int ign = top.eval.getIgnition();
-
-						if (turn > ign)
-							ign += Config::Ignition;
-
-						next.eval = Evaluation(next.info, chain, top.eval, turn, ign);
+						next.eval = Evaluation(next.info, chain, top.eval, turn);
 
 						qData[t + 1].push(std::move(next));
 					}
 				}
 			}
 		}
-
-		const auto enemyData = enemyThink();
-
-		//enemyData.chain.debug();
-		enemyData.info.debug();
-		//enemyData.info.field.debug();
+		*/
+		const int thinkTime = [&]() {
+			if (baseTime > 120 * 1000) return Config::ThinkTime * 2;
+			if (baseTime > 60 * 1000) return Config::ThinkTime;
+			if (baseTime > 30 * 1000) return Config::ThinkTime / 2;
+			return 100;
+		}();
 
 		Timer timer;
-		timer.set(std::chrono::milliseconds(Config::ThinkTime));
+		timer.set(std::chrono::milliseconds(thinkTime));
 
 		long long int loop = 0;
 
@@ -241,37 +312,10 @@ public:
 
 							if (next.info.field.isSurvival())
 							{
-
-								int ign = top.eval.getIgnition();
-
-								if (turn > ign)
-									ign += Config::Ignition;
-
-								next.eval = Evaluation(next.info, chain, top.eval, turn, ign);
+								next.eval = Evaluation(next.info, chain, top.eval, turn);
 
 								qData[t + 1].push(std::move(next));
 							}
-						}
-					}
-
-					if (top.info.gauge >= SkillCost)
-					{
-						auto next = top;
-
-						next.com[t] = Command(true);
-
-						const auto chain = next.info.simulation(next.com[t], packs[turn]);
-
-						if (top.info.field.isSurvival())
-						{
-							int ign = top.eval.getIgnition();
-
-							if (turn > ign)
-								ign += Config::Ignition;
-
-							next.eval = Evaluation(next.info, chain, top.eval, turn, ign);
-
-							qData[t + 1].push(std::move(next));
 						}
 					}
 
@@ -292,6 +336,8 @@ public:
 
 				top.info.debug("My Best");
 				top.eval.debug();
+
+				if (attackFlag) std::cerr << "発火" << std::endl;
 
 				return top.com[0].toString();
 			}
