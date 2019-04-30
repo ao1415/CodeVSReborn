@@ -8,18 +8,15 @@ namespace Config {
 
 
 	/// <summary>探査ターン数</summary>
-	constexpr int Turn = 15;
+	constexpr int Turn = 10;
 	/// <summary>探査時のビーム幅</summary>
 	constexpr int Chokudai = 3;
 	/// <summary>探査時間</summary>
-	constexpr int ThinkTime = 3000;
+	constexpr int ThinkTime = 1500;
 
-	/// <summary>発火ターン数</summary>
-	constexpr int Ignition = 15;
-	/// <summary>発火ターンのずれ</summary>
-	constexpr int IgnitionDev = 3;
-	constexpr std::array<double, IgnitionDev> IgnitionRate{ 1.5,1.3,1.1 };
-
+	constexpr int UselessChain = 1;
+	constexpr int ChainIgnition = 8;
+	constexpr int SkillIgnitionScore = 300;
 
 	/// <summary>敵の探査ターン数</summary>
 	constexpr int EnemyThinkTurn = 3;
@@ -30,7 +27,6 @@ class Evaluation {
 private:
 
 	double score = 0;
-	int ignition = 0;
 
 	Chain maxChain(const PlayerInfo& info) {
 
@@ -57,18 +53,19 @@ private:
 public:
 
 	Evaluation() {}
-	Evaluation(const PlayerInfo& info, const Chain& chain, const Evaluation& prev, const int turn, const int ignition) {
+	Evaluation(const PlayerInfo& info, const Chain& chain, const Evaluation& prev, const int turn) {
 
 		auto random = Random::Get();
 
-		this->ignition = ignition;
-
 		const auto potentialChain = maxChain(info);
+		const auto skillChain = info.copy().field.useSkill();
 
-		score = prev.score;
-		score += chain.score;
+		//score = prev.score;
+		score -= chain.score;
 
-		score += potentialChain.score * 2;
+		score += potentialChain.chain * 100;
+		score += skillChain.score * 10;
+		score += info.gauge / 10;
 
 		score += random->swing();
 	}
@@ -78,13 +75,10 @@ public:
 		return score < other.score;
 	}
 
-	int getIgnition() const { return ignition; }
-
 	void debug() const {
 
 		std::cerr << "Evaluation" << std::endl;
 		std::cerr << "Evaluation:" << score << std::endl;
-		std::cerr << "Ignition  :" << ignition << std::endl;
 
 	}
 
