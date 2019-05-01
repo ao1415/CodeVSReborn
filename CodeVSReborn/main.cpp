@@ -5,6 +5,20 @@
 std::shared_ptr<Share> Share::instance;
 std::shared_ptr<Random> Random::instance;
 
+void simulationDebug(const Command& com) {
+
+	const auto share = Share::Get();
+	const auto pack = share->pack();
+
+	auto next = share->my().copy();
+	const auto c = next.simulation(com, pack);
+
+	std::cerr << "Simulation Debug" << std::endl;
+	next.debug();
+	c.debug();
+	next.field.debug();
+}
+
 void run() {
 
 	auto share = Share::Get();
@@ -20,13 +34,15 @@ void run() {
 
 		std::cerr << "turn:" << std::setw(3) << share->turn() << "================" << std::endl;
 		sw.start();
-		const std::string command = ai.think();
+		const auto command = ai.think();
 		sw.stop();
+
+		simulationDebug(command);
 
 		std::cerr << sw.toString_ms() << std::endl;
 		std::cerr.flush();
 
-		std::cout << command << std::endl;
+		std::cout << command.toString() << std::endl;
 		std::cout.flush();
 	}
 
@@ -44,7 +60,7 @@ void test() {
 	{
 		auto test = base.copy();
 
-		test.simulation(Command(true), Pack());
+		const auto c = test.simulation(Command(true), Pack());
 
 	}
 	sw.stop();

@@ -12,6 +12,7 @@
 
 #include <stack>
 #include <queue>
+#include <unordered_set>
 
 #include <algorithm>
 #include <chrono>
@@ -20,31 +21,10 @@
 #include <cmath>
 #include <tuple>
 
+#include "Constant.hpp"
+
 #include "FixedGrid.hpp"
 #include "Clock.hpp"
-
-using Num = char;
-
-constexpr int DangerLine = 3;
-
-constexpr int Width = 10;
-constexpr int Height = 16 + DangerLine;
-
-constexpr int MaxTurn = 500;
-constexpr int MaxGauge = 100;
-constexpr int PackSize = 2;
-
-constexpr int PackDropRange = 9;
-constexpr Num Empty = 0;
-constexpr Num Inf = 99;
-
-constexpr int SkillCost = 80;
-constexpr int GaugeAdd = 8;
-
-constexpr Num Elimination = 10;
-constexpr Num Garbage = 11;
-
-const std::string Skill = "S";
 
 using PackArray = FixedGrid<Num, PackSize, PackSize>;
 using FieldArray = FixedGrid<Num, Width, Height>;

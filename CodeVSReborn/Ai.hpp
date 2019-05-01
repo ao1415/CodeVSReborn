@@ -12,6 +12,7 @@ struct Data {
 	std::array<Command, Config::Turn> com;
 
 	Evaluation eval;
+	Chain chain;
 
 	bool operator<(const Data& o) const {
 		return eval < o.eval;
@@ -35,6 +36,8 @@ private:
 	std::array<Pack, MaxTurn> packs;
 	std::array<Command, Config::Turn> prevCom;
 	bool attackFlag = false;
+
+	std::unordered_set<HashBit> hashSet;
 
 	[[nodiscard]]
 	EnemyData enemyThink(const int garbage = 0) {
@@ -159,23 +162,29 @@ private:
 		{
 			for (int rot = 0; rot < 4; rot++)
 			{
-				auto top = now;
+				auto next = now;
 
-				top.com[0] = Command(pos, rot);
+				next.com[0] = Command(pos, rot);
 
-				const auto chain = top.info.simulation(top.com[0], packs[turn]);
+				const auto chain = next.info.simulation(next.com[0], packs[turn]);
 
-				if (top.info.field.isSurvival())
+				if (next.info.field.isSurvival())
 				{
-					if (chain.chain >= Config::ChainIgnition)
+					const auto hashCode = next.info.field.hash();
+					if (hashSet.find(hashCode) == hashSet.cend())
 					{
-						top.eval = Evaluation(top.info, chain, Evaluation(), turn);
-						attack.push(std::move(top));
-					}
-					else if (chain.chain <= Config::UselessChain)
-					{
-						top.eval = Evaluation(top.info, chain, Evaluation(), turn);
-						collect.push(std::move(top));
+						hashSet.insert(hashCode);
+						if (chain.chain >= Config::ChainIgnition)
+						{
+							next.eval = Evaluation(next.info, chain, Evaluation(), turn);
+							next.chain = chain;
+							attack.push(std::move(next));
+						}
+						else if (chain.chain <= Config::UselessChain)
+						{
+							next.eval = Evaluation(next.info, chain, Evaluation(), turn);
+							collect.push(std::move(next));
+						}
 					}
 				}
 			}
@@ -183,18 +192,19 @@ private:
 
 		if (now.info.gauge >= SkillCost)
 		{
-			auto top = now;
+			auto next = now;
 
-			top.com[0] = Command(true);
+			next.com[0] = Command(true);
 
-			const auto chain = top.info.simulation(top.com[0], packs[turn]);
+			const auto chain = next.info.simulation(next.com[0], packs[turn]);
 
-			if (top.info.field.isSurvival())
+			if (next.info.field.isSurvival())
 			{
 				if (chain.score >= Config::SkillIgnitionScore)
 				{
-					top.eval = Evaluation(top.info, chain, Evaluation(), turn);
-					attack.push(std::move(top));
+					next.eval = Evaluation(next.info, chain, Evaluation(), turn);
+					next.chain = chain;
+					attack.push(std::move(next));
 				}
 			}
 		}
@@ -219,7 +229,7 @@ public:
 
 	}
 
-	std::string think() {
+	const Command think() {
 
 		const auto& share = *Share::Get();
 		const auto& baseTurn = share.turn();
@@ -229,6 +239,8 @@ public:
 
 		const auto& baseTime = my.time;
 		const auto& field = my.field;
+
+		hashSet.clear();
 
 		std::array<std::priority_queue<Data>, Config::Turn + 1> qData;
 
@@ -312,9 +324,14 @@ public:
 
 							if (next.info.field.isSurvival())
 							{
-								next.eval = Evaluation(next.info, chain, top.eval, turn);
+								const auto hashCode = next.info.field.hash();
+								if (hashSet.find(hashCode) == hashSet.cend())
+								{
+									hashSet.insert(hashCode);
+									next.eval = Evaluation(next.info, chain, top.eval, turn);
 
-								qData[t + 1].push(std::move(next));
+									qData[t + 1].push(std::move(next));
+								}
 							}
 						}
 					}
@@ -325,7 +342,6 @@ public:
 			loop++;
 		}
 
-		std::cerr << "loop:" << loop << std::endl;
 
 		for (int i = Config::Turn - 1; i >= 0; i--)
 		{
@@ -337,15 +353,19 @@ public:
 				top.info.debug("My Best");
 				top.eval.debug();
 
-				if (attackFlag) std::cerr << "”­‰Î" << std::endl;
-
-				return top.com[0].toString();
+				std::cerr << "loop:" << loop << std::endl;
+				if (attackFlag)
+				{
+					std::cerr << "!Ignition!" << std::endl;
+					top.chain.debug();
+				}
+				return top.com[0];
 			}
 		}
 
-		std::cerr << "‚Þ‚è‚Û(LEƒÖEM)" << std::endl;
+		std::cerr << ":'(" << std::endl;
 
-		return Command().toString();
+		return Command();
 	}
 
 };
