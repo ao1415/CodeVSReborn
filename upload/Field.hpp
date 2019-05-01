@@ -3,131 +3,6 @@
 #include "Base.hpp"
 #include "Pack.hpp"
 
-constexpr std::array<std::bitset<Width>, Width> LineColumn
-{
-	0b1100000000,
-	0b1110000000,
-	0b0111000000,
-	0b0011100000,
-	0b0001110000,
-	0b0000111000,
-	0b0000011100,
-	0b0000001110,
-	0b0000000111,
-	0b0000000011
-};
-constexpr std::array<std::bitset<Width>, PackDropRange> PackColumn
-{
-	0b1110000000,
-	0b1111000000,
-	0b0111100000,
-	0b0011110000,
-	0b0001111000,
-	0b0000111100,
-	0b0000011110,
-	0b0000001111,
-	0b0000000111
-};
-
-using BitTable = std::bitset<256>;
-constexpr std::array<BitTable, Height> BlockTable
-{
-	0x00000001,
-	0x00000002,
-	0x00000004,
-	0x00000008,
-	0x00000010,
-	0x00000020,
-	0x00000040,
-	0x00000080,
-	0x00000100,
-	0x00000200,
-	0x00000400,
-	0x00000800,
-	0x00001000,
-	0x00002000,
-	0x00004000,
-	0x00008000,
-	0x00010000,
-	0x00020000,
-	0x00040000
-};
-const std::array<BitTable, 8> BlockSentinel
-{
-	//è„
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x3FFFF7FF) << 160) |
-	(BitTable(0xFEFFFFDF) << 128) |
-	(BitTable(0xFFFBFFFF) << 96) |
-	(BitTable(0x7FFFEFFF) << 64) |
-	(BitTable(0xFDFFFFBF) << 32) |
-	(BitTable(0xFFF7FFFE)),
-	//â∫
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x1FFFFBFF) << 160) |
-	(BitTable(0xFF7FFFEF) << 128) |
-	(BitTable(0xFFFDFFFF) << 96) |
-	(BitTable(0xBFFFF7FF) << 64) |
-	(BitTable(0xFEFFFFDF) << 32) |
-	(BitTable(0xFFFBFFFF)),
-	//âE
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x3FFFFFFF) << 160) |
-	(BitTable(0xFFFFFFFF) << 128) |
-	(BitTable(0xFFFFFFFF) << 96) |
-	(BitTable(0xFFFFFFFF) << 64) |
-	(BitTable(0xFFFFFFFF) << 32) |
-	(BitTable(0xFFF80000)),
-	//ç∂
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x000007FF) << 160) |
-	(BitTable(0xFFFFFFFF) << 128) |
-	(BitTable(0xFFFFFFFF) << 96) |
-	(BitTable(0xFFFFFFFF) << 64) |
-	(BitTable(0xFFFFFFFF) << 32) |
-	(BitTable(0xFFFFFFFF)),
-	//âEè„
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x3FFFF7FF) << 160) |
-	(BitTable(0xFEFFFFDF) << 128) |
-	(BitTable(0xFFFBFFFF) << 96) |
-	(BitTable(0x7FFFEFFF) << 64) |
-	(BitTable(0xFDFFFFBF) << 32) |
-	(BitTable(0xFFF00000)),
-	//âEâ∫
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x1FFFFBFF) << 160) |
-	(BitTable(0xFF7FFFEF) << 128) |
-	(BitTable(0xFFFDFFFF) << 96) |
-	(BitTable(0xBFFFF7FF) << 64) |
-	(BitTable(0xFEFFFFDF) << 32) |
-	(BitTable(0xFFF80000)),
-	//ç∂è„
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x000007FF) << 160) |
-	(BitTable(0xFEFFFFDF) << 128) |
-	(BitTable(0xFFFBFFFF) << 96) |
-	(BitTable(0x7FFFEFFF) << 64) |
-	(BitTable(0xFDFFFFBF) << 32) |
-	(BitTable(0xFFF7FFFE)),
-	//ç∂â∫
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x000003FF) << 160) |
-	(BitTable(0xFF7FFFEF) << 128) |
-	(BitTable(0xFFFDFFFF) << 96) |
-	(BitTable(0xBFFFF7FF) << 64) |
-	(BitTable(0xFEFFFFDF) << 32) |
-	(BitTable(0xFFFBFFFF))
-};
-
 class Field {
 private:
 
@@ -236,7 +111,7 @@ private:
 	}
 
 	const Chain bombBlock(CheckLine& recalc) {
-		
+
 		const Num BombNumber = 5;
 
 		BitFieldArray bitField(false);
@@ -429,11 +304,9 @@ public:
 		return bomb + chain;
 	}
 
-	const Chain dropCell(const int num) {
+	const Chain dropCell(const int pos, const int num) {
 
 		CheckLine recalc(false);
-
-		constexpr int pos = 2;
 
 		recalc = LineColumn[pos];
 
@@ -464,6 +337,21 @@ public:
 		});
 	}
 
+	[[nodiscard]]
+	const HashBit hash() const {
+
+		HashBit h = 0;
+
+		for (int x = 0; x < Width; x++)
+		{
+			for (int y = Height - 1; y > elevation[x]; y--)
+			{
+				h ^= ZobristHash[y * Width + x][table[y][x] - 1];
+			}
+		}
+
+		return h;
+	}
 
 	//[[deprecated("used for debug only")]]
 	void debug() const {

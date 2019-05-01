@@ -35,15 +35,18 @@ private:
 		Chain max;
 		double chainScore = 0.0;
 
-		for (int num = 1; num <= 9; num++)
+		for (int pos = 0; pos < Width; pos++)
 		{
-			auto next = info.copy();
-			auto chain = next.field.dropCell(num);
-
-			if (max.score < chain.score)
+			for (int num = 1; num <= 9; num++)
 			{
-				max = chain;
-				chainScore = score;
+				auto next = info.copy();
+				auto chain = next.field.dropCell(pos, num);
+
+				if (max.score < chain.score)
+				{
+					max = chain;
+					chainScore = score;
+				}
 			}
 		}
 
@@ -58,13 +61,13 @@ public:
 		auto random = Random::Get();
 
 		const auto potentialChain = maxChain(info);
-		const auto skillChain = info.copy().field.useSkill();
+		//const auto skillChain = info.copy().field.useSkill();
 
 		//score = prev.score;
 		score -= chain.score;
 
 		score += potentialChain.chain * 100;
-		score += skillChain.score * 10;
+		//score += skillChain.score * 10;
 		score += info.gauge / 10;
 
 		score += random->swing();

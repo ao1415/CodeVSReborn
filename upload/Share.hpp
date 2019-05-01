@@ -42,6 +42,7 @@ struct PlayerInfo {
 
 	}
 
+	[[nodiscard]]
 	Chain simulation(const Command& com, const Pack& pack) {
 
 		if (com.skill)
@@ -135,6 +136,8 @@ public:
 	const inline std::array<Pack, MaxTurn>& packs() const { return m_packs; }
 	[[nodiscard]]
 	const inline Pack& pack(const int n) const { return m_packs[n]; }
+	[[nodiscard]]
+	const inline Pack& pack() const { return m_packs[m_turn]; }
 
 	[[nodiscard]]
 	const inline int turn() const { return m_turn; }
