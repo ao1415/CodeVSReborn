@@ -69,6 +69,21 @@ void test() {
 
 }
 
+void timerTest() {
+
+	Stopwatch sw;
+	MilliSecTimer mTimer(std::chrono::milliseconds(1000));
+
+	sw.start();
+	mTimer.start();
+	while (!mTimer) {}
+	sw.stop();
+	std::cerr << sw.toString_us() << std::endl;
+	std::cerr << sw.toString_ms() << std::endl;
+
+
+}
+
 int main() {
 
 	Share::Create();
@@ -79,6 +94,7 @@ int main() {
 
 	run();
 	//test();
+	//timerTest();
 
 	return 0;
 }
