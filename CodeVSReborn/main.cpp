@@ -38,7 +38,7 @@ void run() {
 		const auto command = ai.think();
 		sw.stop();
 
-		simulationDebug(command);
+		//simulationDebug(command);
 
 		std::cerr << sw.toString_ms() << std::endl;
 		std::cerr.flush();

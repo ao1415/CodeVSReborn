@@ -8,7 +8,7 @@ namespace Config {
 
 
 	/// <summary>’T¸ƒ^[ƒ“”</summary>
-	constexpr int Turn = 10;
+	constexpr int Turn = 12;
 	/// <summary>’T¸‚Ìƒr[ƒ€•</summary>
 	constexpr int Chokudai = 3;
 	/// <summary>’T¸ŠÔ</summary>
@@ -16,7 +16,7 @@ namespace Config {
 
 	constexpr int UselessChain = 1;
 	constexpr int ChainIgnition = 10;
-	constexpr int SkillIgnitionScore = 300;
+	constexpr int SkillIgnitionScore = 200;
 
 	/// <summary>“G‚Ì’T¸ƒ^[ƒ“”</summary>
 	constexpr int EnemyThinkTurn = 3;
@@ -35,7 +35,9 @@ private:
 		Chain max;
 		double chainScore = 0.0;
 
-		for (int pos = 0; pos < Width; pos++)
+		constexpr int DropPos[] = { 1,2,7,8 };
+
+		for (const auto& pos : DropPos)
 		{
 			for (int num = 1; num <= 9; num++)
 			{
