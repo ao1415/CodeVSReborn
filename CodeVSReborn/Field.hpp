@@ -6,177 +6,163 @@
 class Field {
 private:
 
-	FieldArray table;
+	/*
+	内部データの方針
+	x座標：見た目通り　フィールドの左端が0、右端が9
+	y座標：下から　フィールドの下が下位ビット、上が上位ビット
+	0：ブロックがある場合1、空白の場合0
+	1～9,11：各数字がその座標にある場合1、なければ0
+	*/
+	std::array<std::array<uint32_t, Width>, 12> table;
 
 	using CheckLine = std::bitset<Width>;
 
+	//最も上のブロックのy座標+1の値を保持する
 	std::array<Num, Width> elevation;
 
 	void setElevation() {
 
-		elevation.fill(Height - 1);
 		for (int x = 0; x < Width; x++)
 		{
-			for (int y = DangerLine; y < Height; y++)
+			setElevation(x);
+		}
+
+	}
+	void setElevation(const int x) {
+
+		auto line = ~table[0][x];
+		for (int i = 0; i < Height; i++)
+		{
+			if (line >> i & 1)
 			{
-				if (table[y][x] != Empty)
-				{
-					elevation[x] = y - 1;
-					break;
-				}
+				elevation[x] = i;
+				break;
 			}
 		}
 
 	}
 
-	bool eraseBlock(CheckLine& recalc) {
+	bool eraseBlock(uint16_t& recalc) {
 
-		BitFieldArray bitField(false);
+		std::array<uint32_t, Width> chainTable = { 0,0,0,0,0,0,0,0,0,0 };
 
 		for (int x = 0; x < Width; x++)
 		{
-			if (recalc[x])
+			if ((recalc&RecalcBitMask[x]) > 0)
 			{
-				for (int y = Height - 1; y > elevation[x]; y--)
+				//上
+				uint32_t u = 0;
+				u |= (table[1][x] << 1)&table[9][x];
+				u |= (table[2][x] << 1)&table[8][x];
+				u |= (table[3][x] << 1)&table[7][x];
+				u |= (table[4][x] << 1)&table[6][x];
+				u |= (table[5][x] << 1)&table[5][x];
+				u |= (table[6][x] << 1)&table[4][x];
+				u |= (table[7][x] << 1)&table[3][x];
+				u |= (table[8][x] << 1)&table[2][x];
+				u |= (table[9][x] << 1)&table[1][x];
+				chainTable[x] |= u;
+				chainTable[x] |= (u >> 1);
+			}
+		}
+
+		for (int x = 0; x < Width - 1; x++)
+		{
+			if ((recalc&RecalcBitMask[x]) > 0)
+			{
 				{
-					//上
-					{
-						int px = x + 0; int py = y - 1;
-
-						const int sum = table[y][x] + table[py][px];
-						if (sum == Elimination)
-							bitField[y][x] = bitField[py][px] = true;
-					}
-
-					//右
-					{
-						int px = x + 1; int py = y - 0;
-
-						if (px < Width)
-						{
-							const int sum = table[y][x] + table[py][px];
-							if (sum == Elimination)
-								bitField[y][x] = bitField[py][px] = true;
-						}
-					}
-
 					//右上
-					{
-						int px = x + 1; int py = y - 1;
-
-						if (px < Width)
-						{
-							const int sum = table[y][x] + table[py][px];
-							if (sum == Elimination)
-								bitField[y][x] = bitField[py][px] = true;
-						}
-					}
-
-					//左上
-					{
-						int px = x - 1; int py = y - 1;
-
-						if (0 <= px)
-						{
-							const int sum = table[y][x] + table[py][px];
-							if (sum == Elimination)
-								bitField[y][x] = bitField[py][px] = true;
-						}
-					}
+					uint32_t ru = 0;
+					ru |= (table[1][x] << 1)&table[9][x + 1];
+					ru |= (table[2][x] << 1)&table[8][x + 1];
+					ru |= (table[3][x] << 1)&table[7][x + 1];
+					ru |= (table[4][x] << 1)&table[6][x + 1];
+					ru |= (table[5][x] << 1)&table[5][x + 1];
+					ru |= (table[6][x] << 1)&table[4][x + 1];
+					ru |= (table[7][x] << 1)&table[3][x + 1];
+					ru |= (table[8][x] << 1)&table[2][x + 1];
+					ru |= (table[9][x] << 1)&table[1][x + 1];
+					chainTable[x + 1] |= ru;
+					chainTable[x + 0] |= (ru >> 1);
+				}
+				{
+					//右
+					uint32_t r = 0;
+					r |= (table[1][x])&table[9][x + 1];
+					r |= (table[2][x])&table[8][x + 1];
+					r |= (table[3][x])&table[7][x + 1];
+					r |= (table[4][x])&table[6][x + 1];
+					r |= (table[5][x])&table[5][x + 1];
+					r |= (table[6][x])&table[4][x + 1];
+					r |= (table[7][x])&table[3][x + 1];
+					r |= (table[8][x])&table[2][x + 1];
+					r |= (table[9][x])&table[1][x + 1];
+					chainTable[x + 1] |= r;
+					chainTable[x + 0] |= r;
+				}
+				{
+					//右下
+					uint32_t rd = 0;
+					rd |= (table[1][x] >> 1)&table[9][x + 1];
+					rd |= (table[2][x] >> 1)&table[8][x + 1];
+					rd |= (table[3][x] >> 1)&table[7][x + 1];
+					rd |= (table[4][x] >> 1)&table[6][x + 1];
+					rd |= (table[5][x] >> 1)&table[5][x + 1];
+					rd |= (table[6][x] >> 1)&table[4][x + 1];
+					rd |= (table[7][x] >> 1)&table[3][x + 1];
+					rd |= (table[8][x] >> 1)&table[2][x + 1];
+					rd |= (table[9][x] >> 1)&table[1][x + 1];
+					chainTable[x + 1] |= rd;
+					chainTable[x + 0] |= (rd << 1);
 				}
 			}
 		}
 
-		const auto prev = recalc;
+		uint16_t nextClac = 0;
 
 		for (int x = 0; x < Width; x++)
 		{
-			bool update = false;
-			if (prev[x])
+			if (chainTable[x] > 0)
 			{
-				for (int y = Height - 1; y > elevation[x]; y--)
-				{
-					if (bitField[y][x])
-					{
-						table[y][x] = Empty;
+				nextClac |= RecalcBitMask[x];
 
-						update = true;
-					}
-				}
-				recalc.set(x, update);
+				table[0][x] &= (~chainTable[x]);
 			}
 		}
+		recalc = nextClac;
 
-		return recalc.any();
+		return nextClac > 0;
 	}
 
-	const Chain bombBlock(CheckLine& recalc) {
+	const Chain bombBlock(uint16_t& recalc) {
 
 		const Num BombNumber = 5;
 
-		BitFieldArray bitField(false);
+		std::array<uint32_t, Width> bombTable = table[BombNumber];
 
-		//横・右下・下・左下
-		int dx[] = { 1,1,0,-1 };
-		int dy[] = { 0,1,1,1 };
-
-		for (int y = 0; y < Height; y++)
+		for (int x = 0; x < Width; x++)
 		{
-			for (int x = 0; x < Width; x++)
-			{
-				if (table[y][x] == BombNumber)
-				{
-					bitField[y][x] = true;
-					for (int d = 0; d < 4; d++)
-					{
-						int px = x + dx[d];
-						int py = y + dy[d];
-
-						if (inside(px, py))
-						{
-							if (table[py][px] != Garbage && table[py][px] != Empty)
-							{
-								bitField[py][px] = true;
-							}
-						}
-					}
-				}
-				else if (table[y][x] != Garbage && table[y][x] != Empty)
-				{
-					for (int d = 0; d < 4; d++)
-					{
-						int px = x + dx[d];
-						int py = y + dy[d];
-
-						if (inside(px, py))
-						{
-							if (table[py][px] == BombNumber)
-							{
-								bitField[y][x] = true;
-								bitField[py][px] = true;
-								break;
-							}
-						}
-					}
-				}
-			}
+			bombTable[x] |= (table[BombNumber][x] << 1) & table[0][x];//上
+		}
+		for (int x = 0; x < Width - 1; x++)
+		{
+			bombTable[x + 1] |= (table[BombNumber][x] << 1) & table[0][x + 1];//右上
+			bombTable[x + 1] |= (table[BombNumber][x]) & table[0][x + 1];//右
+			bombTable[x + 1] |= (table[BombNumber][x] >> 1) & table[0][x + 1];//右下
 		}
 
+		recalc = 0;
 		int disBlock = 0;
 		for (int x = 0; x < Width; x++)
 		{
-			bool update = false;
-			for (int y = Height - 1; y > elevation[x]; y--)
+			if (bombTable[x] > 0)
 			{
-				if (bitField[y][x])
-				{
-					table[y][x] = Empty;
-					disBlock++;
+				recalc |= RecalcBitMask[x];
 
-					update = true;
-				}
+				table[0][x] &= (~bombTable[x]);
+
+				disBlock += __popcnt(bombTable[x]);
 			}
-			recalc.set(x, update);
 		}
 
 		int score = 0;
@@ -186,7 +172,7 @@ private:
 		return Chain(0, score, score / 2);
 	}
 
-	const Chain chainBlock(CheckLine& recalc) {
+	const Chain chainBlock(uint16_t& recalc) {
 
 		int score = 0;
 		int chain = 0;
@@ -203,63 +189,70 @@ private:
 		return Chain(chain, score, score / 2);
 	}
 
-	void fallBlock(CheckLine& recalc) {
+	//table[0]で0になっているものを詰める
+	void fallBlock(uint16_t& recalc) {
 
-		const auto prev = recalc;
-		recalc.reset();
+		uint16_t nextClac = 0;
 
 		for (int x = 0; x < Width; x++)
 		{
-			if (prev[x])
+			if ((recalc & RecalcBitMask[x]) > 0)
 			{
-				const int h = elevation[x];
-				int index = Height - 1;
-				for (int y = index; y > h; y--)
-				{
-					if (table[y][x] != Empty)
-					{
-						if (index != y)
-						{
-							table[index][x] = table[y][x];
-							table[y][x] = Empty;
-						}
-						index--;
-					}
-				}
-				elevation[x] = index;
-				recalc |= LineColumn[x];
+				//各数字を落下させる
+				table[1][x] = _pext_u32(table[1][x], table[0][x]);
+				table[2][x] = _pext_u32(table[2][x], table[0][x]);
+				table[3][x] = _pext_u32(table[3][x], table[0][x]);
+				table[4][x] = _pext_u32(table[4][x], table[0][x]);
+				table[5][x] = _pext_u32(table[5][x], table[0][x]);
+				table[6][x] = _pext_u32(table[6][x], table[0][x]);
+				table[7][x] = _pext_u32(table[7][x], table[0][x]);
+				table[8][x] = _pext_u32(table[8][x], table[0][x]);
+				table[9][x] = _pext_u32(table[9][x], table[0][x]);
+				table[11][x] = _pext_u32(table[11][x], table[0][x]);
+
+				//ブロックを落下させる
+				table[0][x] = _pext_u32(table[0][x], table[0][x]);
+
+				nextClac |= RecalcLine[x];
+
+				setElevation(x);
 			}
 		}
 
+		recalc = nextClac;
 	}
 
-	void setPack(const Pack& pack, const Command& command, CheckLine& recalc) {
+	void setPack(const Pack& pack, const Command& command, uint16_t& recalc) {
 
 		const auto& pos = command.pos;
 		const auto& r = command.rotate;
 
-		recalc = PackColumn[pos];
+		recalc = RecalcLine[pos] | RecalcLine[pos + 1];
 
 		if (pack[r][1][0] != Empty)
 		{
-			table[elevation[pos + 0]][pos + 0] = pack[r][1][0];
-			elevation[pos + 0]--;
+			table[0][pos + 0] |= LineBit[elevation[pos + 0]];
+			table[pack[r][1][0]][pos + 0] |= LineBit[elevation[pos + 0]];
+			elevation[pos + 0]++;
 		}
 		if (pack[r][0][0] != Empty)
 		{
-			table[elevation[pos + 0]][pos + 0] = pack[r][0][0];
-			elevation[pos + 0]--;
+			table[0][pos + 0] |= LineBit[elevation[pos + 0]];
+			table[pack[r][0][0]][pos + 0] |= LineBit[elevation[pos + 0]];
+			elevation[pos + 0]++;
 		}
 
 		if (pack[r][1][1] != Empty)
 		{
-			table[elevation[pos + 1]][pos + 1] = pack[r][1][1];
-			elevation[pos + 1]--;
+			table[0][pos + 1] |= LineBit[elevation[pos + 1]];
+			table[pack[r][1][1]][pos + 1] |= LineBit[elevation[pos + 1]];
+			elevation[pos + 1]++;
 		}
 		if (pack[r][0][1] != Empty)
 		{
-			table[elevation[pos + 1]][pos + 1] = pack[r][0][1];
-			elevation[pos + 1]--;
+			table[0][pos + 1] |= LineBit[elevation[pos + 1]];
+			table[pack[r][0][1]][pos + 1] |= LineBit[elevation[pos + 1]];
+			elevation[pos + 1]++;
 		}
 
 	}
@@ -267,31 +260,33 @@ private:
 public:
 
 	Field() {
-		table.fill(0);
-		elevation.fill(Height - 1);
+		for (auto& n : table) n.fill(0);
+		elevation.fill(0);
 	}
 
 	[[nodiscard]]
 	Field copy() const { return std::move(Field(*this)); }
 
+	/// <summary>パックのドロップ</summary>
+	/// <returns>パックドロップ時の結果</returns>
 	[[nodiscard]]
 	const Chain dropPack(const Pack& pack, const Command& command) {
 
-		CheckLine recalc(false);
+		uint16_t recalc(false);
 
 		setPack(pack, command, recalc);
 
 		const auto chain = chainBlock(recalc);
 
-		//debug();
-
 		return chain;
 	}
 
+	/// <summary>スキルの使用</summary>
+	/// <returns>スキル使用時の結果</returns>
 	[[nodiscard]]
 	const Chain useSkill() {
 
-		CheckLine recalc(false);
+		uint16_t recalc(false);
 
 		const auto bomb = bombBlock(recalc);
 
@@ -299,19 +294,21 @@ public:
 
 		const auto chain = chainBlock(recalc);
 
-		//debug();
-
 		return bomb + chain;
 	}
 
+	/// <summary>仮ブロック設置</summary>
+	/// <returns>仮ブロック設置時の結果</returns>
 	const Chain dropCell(const int pos, const int num) {
 
-		CheckLine recalc(false);
+		uint16_t recalc(false);
 
-		recalc = LineColumn[pos];
+		recalc = RecalcLine[pos];
 
-		table[elevation[pos]][pos] = num;
-		elevation[pos]--;
+		table[0][pos] |= LineBit[elevation[pos]];
+		table[num][pos] |= LineBit[elevation[pos]];
+
+		elevation[pos]++;
 
 		const auto chain = chainBlock(recalc);
 
@@ -322,46 +319,60 @@ public:
 
 		for (int x = 0; x < Width; x++)
 		{
-			table[elevation[x]][x] = Garbage;
-			elevation[x]--;
+			table[0][x] |= LineBit[elevation[x]];
+			table[Garbage][x] |= LineBit[elevation[x]];
+			elevation[x]++;
 		}
 
 	}
 
 	[[nodiscard]]
-	const FieldArray& getFieldArray() const { return table; }
-	[[nodiscard]]
 	const bool isSurvival() const {
-		return !std::any_of(elevation.cbegin(), elevation.cend(), [](int x) {
-			return x <= DangerLine;
+		return !std::any_of(elevation.cbegin(), elevation.cend(), [](int y) {
+			return y >= Height - DangerLine;
 		});
 	}
 
 	[[nodiscard]]
 	const HashBit hash() const {
 
-		HashBit h = 0;
+		HashBit code = 0;
 
-		for (int x = 0; x < Width; x++)
+		constexpr HashBit FNV_OFFSET_BASIS_32 = 2166136261U;
+		constexpr HashBit FNV_PRIME_32 = 16777619U;
+
+		for (int n = 0; n < 12; n++)
 		{
-			for (int y = Height - 1; y > elevation[x]; y--)
+			for (int x = 0; x < Width; x++)
 			{
-				h ^= ZobristHash[y * Width + x][table[y][x] - 1];
+				code = (FNV_PRIME_32*code) ^ (table[n][x]);
 			}
 		}
 
-		return h;
+		return code;
 	}
 
 	//[[deprecated("used for debug only")]]
 	void debug() const {
 
-		for (int y = 0; y < Height; y++)
+		for (int y = Height - 1; y >= 0; y--)
 		{
 			for (int x = 0; x < Width; x++)
 			{
-				//std::cerr << (table[y][x] < Elimination ? std::to_string(table[y][x]) : "#") << " ";
-				std::cerr << static_cast<int>(table[y][x]) << " ";
+				if ((table[0][x] & LineBit[y]) > 0)
+				{
+					for (int n = 1; n < 12; n++)
+					{
+						if ((table[n][x] & LineBit[y]) > 0)
+						{
+							std::cerr << n << " ";
+						}
+					}
+				}
+				else
+				{
+					std::cerr << "0 ";
+				}
 			}
 			std::cerr << std::endl;
 		}
@@ -373,13 +384,18 @@ public:
 
 		Field field;
 
-		for (int y = DangerLine; y < Height; y++)
+		for (int y = 0; y < Height - DangerLine; y++)
 		{
 			for (int x = 0; x < Width; x++)
 			{
 				int num;
 				std::cin >> num;
-				field.table[y][x] = static_cast<Num>(num);
+
+				if (num > 0)
+				{
+					field.table[num][x] |= LineBit[(Height - DangerLine - 1) - y];
+					field.table[0][x] |= LineBit[(Height - DangerLine - 1) - y];
+				}
 			}
 			std::cin.ignore();
 		}

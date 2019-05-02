@@ -26,35 +26,38 @@ constexpr Num Garbage = 11;
 const std::string Skill = "S";
 
 using HashBit = unsigned long long int;
-using BitTable = std::bitset<256>;
 
-constexpr std::array<std::bitset<Width>, Width> LineColumn
+//下位ビットが左端、上位ビットが右端
+constexpr std::array<uint16_t, Width + 1> RecalcLine
 {
+	0b0000000001,
 	0b0000000011,
-	0b0000000111,
-	0b0000001110,
-	0b0000011100,
-	0b0000111000,
-	0b0001110000,
-	0b0011100000,
-	0b0111000000,
-	0b1110000000,
-	0b1100000000
-};
-constexpr std::array<std::bitset<Width>, PackDropRange> PackColumn
-{
-	0b0000000111,
-	0b0000001111,
-	0b0000011110,
-	0b0000111100,
-	0b0001111000,
-	0b0011110000,
-	0b0111100000,
-	0b1111000000,
-	0b1110000000,
+	0b0000000110,
+	0b0000001100,
+	0b0000011000,
+	0b0000110000,
+	0b0001100000,
+	0b0011000000,
+	0b0110000000,
+	0b1100000000,
+	0b1111111111,
 };
 
-constexpr std::array<BitTable, Height> BlockTable
+constexpr std::array<uint16_t,Width> RecalcBitMask
+{
+	0b0000000001,
+	0b0000000010,
+	0b0000000100,
+	0b0000001000,
+	0b0000010000,
+	0b0000100000,
+	0b0001000000,
+	0b0010000000,
+	0b0100000000,
+	0b1000000000,
+};
+
+constexpr std::array<uint32_t, Height> LineBit
 {
 	0x00000001,
 	0x00000002,
@@ -75,81 +78,6 @@ constexpr std::array<BitTable, Height> BlockTable
 	0x00010000,
 	0x00020000,
 	0x00040000
-};
-const std::array<BitTable, 8> BlockSentinel
-{
-	//上
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x3FFFF7FF) << 160) |
-	(BitTable(0xFEFFFFDF) << 128) |
-	(BitTable(0xFFFBFFFF) << 96) |
-	(BitTable(0x7FFFEFFF) << 64) |
-	(BitTable(0xFDFFFFBF) << 32) |
-	(BitTable(0xFFF7FFFE)),
-	//下
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x1FFFFBFF) << 160) |
-	(BitTable(0xFF7FFFEF) << 128) |
-	(BitTable(0xFFFDFFFF) << 96) |
-	(BitTable(0xBFFFF7FF) << 64) |
-	(BitTable(0xFEFFFFDF) << 32) |
-	(BitTable(0xFFFBFFFF)),
-	//右
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x3FFFFFFF) << 160) |
-	(BitTable(0xFFFFFFFF) << 128) |
-	(BitTable(0xFFFFFFFF) << 96) |
-	(BitTable(0xFFFFFFFF) << 64) |
-	(BitTable(0xFFFFFFFF) << 32) |
-	(BitTable(0xFFF80000)),
-	//左
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x000007FF) << 160) |
-	(BitTable(0xFFFFFFFF) << 128) |
-	(BitTable(0xFFFFFFFF) << 96) |
-	(BitTable(0xFFFFFFFF) << 64) |
-	(BitTable(0xFFFFFFFF) << 32) |
-	(BitTable(0xFFFFFFFF)),
-	//右上
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x3FFFF7FF) << 160) |
-	(BitTable(0xFEFFFFDF) << 128) |
-	(BitTable(0xFFFBFFFF) << 96) |
-	(BitTable(0x7FFFEFFF) << 64) |
-	(BitTable(0xFDFFFFBF) << 32) |
-	(BitTable(0xFFF00000)),
-	//右下
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x1FFFFBFF) << 160) |
-	(BitTable(0xFF7FFFEF) << 128) |
-	(BitTable(0xFFFDFFFF) << 96) |
-	(BitTable(0xBFFFF7FF) << 64) |
-	(BitTable(0xFEFFFFDF) << 32) |
-	(BitTable(0xFFF80000)),
-	//左上
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x000007FF) << 160) |
-	(BitTable(0xFEFFFFDF) << 128) |
-	(BitTable(0xFFFBFFFF) << 96) |
-	(BitTable(0x7FFFEFFF) << 64) |
-	(BitTable(0xFDFFFFBF) << 32) |
-	(BitTable(0xFFF7FFFE)),
-	//左下
-	(BitTable(0x00000000) << 224) |
-	(BitTable(0x00000000) << 192) |
-	(BitTable(0x000003FF) << 160) |
-	(BitTable(0xFF7FFFEF) << 128) |
-	(BitTable(0xFFFDFFFF) << 96) |
-	(BitTable(0xBFFFF7FF) << 64) |
-	(BitTable(0xFEFFFFDF) << 32) |
-	(BitTable(0xFFFBFFFF))
 };
 
 constexpr std::array<std::array<HashBit, 11>, Width*Height> ZobristHash

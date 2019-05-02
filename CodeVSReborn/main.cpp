@@ -16,6 +16,7 @@ void simulationDebug(const Command& com) {
 	std::cerr << "Simulation Debug" << std::endl;
 	next.debug();
 	c.debug();
+	std::cerr << com.toString() << std::endl;
 	next.field.debug();
 }
 
@@ -37,7 +38,7 @@ void run() {
 		const auto command = ai.think();
 		sw.stop();
 
-		//simulationDebug(command);
+		simulationDebug(command);
 
 		std::cerr << sw.toString_ms() << std::endl;
 		std::cerr.flush();

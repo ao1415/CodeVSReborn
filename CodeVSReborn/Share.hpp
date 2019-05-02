@@ -119,7 +119,7 @@ public:
 
 	bool loop() {
 
-		std::cin >> m_turn;
+		if (!(std::cin >> m_turn)) return false;
 
 		bool check = true;
 		check &= m_my.input();
