@@ -21,6 +21,7 @@
 #include <cmath>
 #include <tuple>
 
+#include "SIMD.hpp"
 #include "Constant.hpp"
 
 #include "FixedGrid.hpp"

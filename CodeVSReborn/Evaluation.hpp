@@ -15,7 +15,7 @@ namespace Config {
 	constexpr int ThinkTime = 1500;
 
 	constexpr int UselessChain = 1;
-	constexpr int ChainIgnition = 8;
+	constexpr int ChainIgnition = 10;
 	constexpr int SkillIgnitionScore = 300;
 
 	/// <summary>“G‚Ì’T¸ƒ^[ƒ“”</summary>
@@ -63,12 +63,12 @@ public:
 		const auto potentialChain = maxChain(info);
 		//const auto skillChain = info.copy().field.useSkill();
 
-		//score = prev.score;
+		score = prev.score;
 		score -= chain.score;
 
 		score += potentialChain.chain * 100;
 		//score += skillChain.score * 10;
-		score += info.gauge / 10;
+		score += info.gauge / 8.0;
 
 		score += random->swing();
 	}
