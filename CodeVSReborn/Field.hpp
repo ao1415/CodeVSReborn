@@ -161,7 +161,7 @@ private:
 
 				table[0][x] &= (~bombTable[x]);
 
-				disBlock += __popcnt(bombTable[x]);
+				disBlock += popcnt(bombTable[x]);
 			}
 		}
 
@@ -199,19 +199,19 @@ private:
 			if ((recalc & RecalcBitMask[x]) > 0)
 			{
 				//各数字を落下させる
-				table[1][x] = _pext_u32(table[1][x], table[0][x]);
-				table[2][x] = _pext_u32(table[2][x], table[0][x]);
-				table[3][x] = _pext_u32(table[3][x], table[0][x]);
-				table[4][x] = _pext_u32(table[4][x], table[0][x]);
-				table[5][x] = _pext_u32(table[5][x], table[0][x]);
-				table[6][x] = _pext_u32(table[6][x], table[0][x]);
-				table[7][x] = _pext_u32(table[7][x], table[0][x]);
-				table[8][x] = _pext_u32(table[8][x], table[0][x]);
-				table[9][x] = _pext_u32(table[9][x], table[0][x]);
-				table[11][x] = _pext_u32(table[11][x], table[0][x]);
+				table[1][x] = pext(table[1][x], table[0][x]);
+				table[2][x] = pext(table[2][x], table[0][x]);
+				table[3][x] = pext(table[3][x], table[0][x]);
+				table[4][x] = pext(table[4][x], table[0][x]);
+				table[5][x] = pext(table[5][x], table[0][x]);
+				table[6][x] = pext(table[6][x], table[0][x]);
+				table[7][x] = pext(table[7][x], table[0][x]);
+				table[8][x] = pext(table[8][x], table[0][x]);
+				table[9][x] = pext(table[9][x], table[0][x]);
+				table[11][x] = pext(table[11][x], table[0][x]);
 
 				//ブロックを落下させる
-				table[0][x] = _pext_u32(table[0][x], table[0][x]);
+				table[0][x] = pext(table[0][x], table[0][x]);
 
 				nextClac |= RecalcLine[x];
 

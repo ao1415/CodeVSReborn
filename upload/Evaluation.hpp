@@ -8,15 +8,15 @@ namespace Config {
 
 
 	/// <summary>’T¸ƒ^[ƒ“”</summary>
-	constexpr int Turn = 10;
+	constexpr int Turn = 12;
 	/// <summary>’T¸‚Ìƒr[ƒ€•</summary>
 	constexpr int Chokudai = 3;
 	/// <summary>’T¸ŠÔ</summary>
 	constexpr int ThinkTime = 1500;
 
 	constexpr int UselessChain = 1;
-	constexpr int ChainIgnition = 8;
-	constexpr int SkillIgnitionScore = 300;
+	constexpr int ChainIgnition = 10;
+	constexpr int SkillIgnitionScore = 200;
 
 	/// <summary>“G‚Ì’T¸ƒ^[ƒ“”</summary>
 	constexpr int EnemyThinkTurn = 3;
@@ -35,7 +35,9 @@ private:
 		Chain max;
 		double chainScore = 0.0;
 
-		for (int pos = 0; pos < Width; pos++)
+		constexpr int DropPos[] = { 1,2,7,8 };
+
+		for (const auto& pos : DropPos)
 		{
 			for (int num = 1; num <= 9; num++)
 			{
@@ -63,12 +65,12 @@ public:
 		const auto potentialChain = maxChain(info);
 		//const auto skillChain = info.copy().field.useSkill();
 
-		//score = prev.score;
+		score = prev.score;
 		score -= chain.score;
 
 		score += potentialChain.chain * 100;
 		//score += skillChain.score * 10;
-		score += info.gauge / 10;
+		score += info.gauge / 8.0;
 
 		score += random->swing();
 	}

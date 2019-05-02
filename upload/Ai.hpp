@@ -167,6 +167,7 @@ private:
 				next.com[0] = Command(pos, rot);
 
 				const auto chain = next.info.simulation(next.com[0], packs[turn]);
+				next.chain = chain;
 
 				if (next.info.field.isSurvival())
 				{
@@ -177,7 +178,6 @@ private:
 						if (chain.chain >= Config::ChainIgnition)
 						{
 							next.eval = Evaluation(next.info, chain, Evaluation(), turn);
-							next.chain = chain;
 							attack.push(std::move(next));
 						}
 						else if (chain.chain <= Config::UselessChain)
@@ -197,14 +197,19 @@ private:
 			next.com[0] = Command(true);
 
 			const auto chain = next.info.simulation(next.com[0], packs[turn]);
+			next.chain = chain;
 
 			if (next.info.field.isSurvival())
 			{
 				if (chain.score >= Config::SkillIgnitionScore)
 				{
 					next.eval = Evaluation(next.info, chain, Evaluation(), turn);
-					next.chain = chain;
 					attack.push(std::move(next));
+				}
+				else
+				{
+					next.eval = Evaluation(next.info, chain, Evaluation(), turn);
+					collect.push(std::move(next));
 				}
 			}
 		}
@@ -291,7 +296,7 @@ public:
 			return 100;
 		}();
 
-		Timer timer;
+		MilliSecTimer timer;
 		timer.set(std::chrono::milliseconds(thinkTime));
 
 		long long int loop = 0;
