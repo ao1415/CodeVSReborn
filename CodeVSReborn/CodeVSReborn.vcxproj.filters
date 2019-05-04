@@ -55,5 +55,8 @@
     <ClInclude Include="SIMD.hpp">
       <Filter>ソース ファイル\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Config.hpp">
+      <Filter>ソース ファイル\Ai</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -352,6 +352,35 @@ public:
 		return code;
 	}
 
+	const int countBlock() const {
+
+		int count = 0;
+
+		count += popcnt(table[0][0]);
+		count += popcnt(table[0][1]);
+		count += popcnt(table[0][2]);
+		count += popcnt(table[0][3]);
+		count += popcnt(table[0][4]);
+		count += popcnt(table[0][5]);
+		count += popcnt(table[0][6]);
+		count += popcnt(table[0][7]);
+		count += popcnt(table[0][8]);
+		count += popcnt(table[0][9]);
+
+		count -= popcnt(table[11][0]);
+		count -= popcnt(table[11][1]);
+		count -= popcnt(table[11][2]);
+		count -= popcnt(table[11][3]);
+		count -= popcnt(table[11][4]);
+		count -= popcnt(table[11][5]);
+		count -= popcnt(table[11][6]);
+		count -= popcnt(table[11][7]);
+		count -= popcnt(table[11][8]);
+		count -= popcnt(table[11][9]);
+
+		return count;
+	}
+
 	//[[deprecated("used for debug only")]]
 	void debug() const {
 
