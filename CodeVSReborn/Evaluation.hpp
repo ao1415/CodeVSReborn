@@ -17,8 +17,9 @@ private:
 		Chain max;
 		double chainScore = 0.0;
 
-		constexpr int DropPos[] = { 1,2,7,8 };
-		const auto& dropNum = share->packNumber(turn);
+		constexpr int DropPos[] = { 0,1,2,7,8,9 };
+		//const auto& dropNum = share->packNumber(turn);
+		const int dropNum[] = { 1,2,3,4,5,6,8,9 };
 
 		for (const auto& pos : DropPos)
 		{
@@ -46,18 +47,18 @@ public:
 		auto random = Random::Get();
 
 		const auto potentialChain = maxChain(info, turn);
-		const auto skillChain = info.copy().field.useSkill();
+		//const auto skillChain = info.copy().field.useSkill();
 
 		const auto blockNum = info.field.countBlock();
 
 		score = prev.score;
-		score += chain.score / 10;
+		score -= chain.score * 10;
 
 		score += potentialChain.chain * 100;
-		score += blockNum * 1;
+		score += blockNum * 10;
 
 		//score += skillChain.score * 10;
-		//score += info.gauge / 8.0;
+		score += info.gauge / 8.0;
 
 		score += random->swing();
 	}

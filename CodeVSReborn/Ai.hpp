@@ -262,23 +262,15 @@ private:
 
 		if (!action[static_cast<size_t>(Action::Attack)].empty())
 		{
-			const auto& top = action[static_cast<size_t>(Action::Attack)].top();
-			const auto garbage = -top.info.garbage;
-			if (garbage > 0)
-			{
-				const auto enemyData2 = enemyThink(garbage);
+			//const auto& top = action[static_cast<size_t>(Action::Attack)].top();
+			//const auto garbage = top.chain.garbage;
+			//const auto enemyData2 = enemyThink(garbage);
 
-				if (-enemyData2.info.garbage <= Config::ToleranceCounterGarbage)
-				{
-					decisionAction = Action::Attack;
-					return action[static_cast<size_t>(Action::Attack)];
-				}
-			}
-			else
-			{
-				decisionAction = Action::Attack;
-				return action[static_cast<size_t>(Action::Attack)];
-			}
+			//if (enemyData2.chain.garbage <= Config::ToleranceCounterGarbage)
+			//{
+			decisionAction = Action::Attack;
+			return action[static_cast<size_t>(Action::Attack)];
+			//}
 		}
 
 

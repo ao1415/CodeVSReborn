@@ -19,9 +19,9 @@ namespace Config {
 	/// <summary>お邪魔ゲージ数</summary>
 	constexpr int JammingGauge = 60;
 	/// <summary>発火チェイン数</summary>
-	constexpr int ChainIgnition = 12;
+	constexpr int ChainIgnition = 10;
 	/// <summary>発火スキルスコア</summary>
-	constexpr int SkillIgnitionScore = 200;
+	constexpr int SkillIgnitionScore = 160;
 
 	/// <summary>許容お邪魔数</summary>
 	constexpr int ToleranceGarbage = 30;
@@ -34,6 +34,6 @@ namespace Config {
 	constexpr int EnemyThinkTurn = 3;
 
 	/// <summary>評価用ナンバーの取得ターン数</summary>
-	constexpr int PackNumberTurn = 10;
+	constexpr int PackNumberTurn = 5;
 
 }
