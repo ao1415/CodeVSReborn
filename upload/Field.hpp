@@ -53,16 +53,23 @@ private:
 				//上
 				uint32_t u = 0;
 				u |= (table[1][x] << 1)&table[9][x];
-				u |= (table[2][x] << 1)&table[8][x];
-				u |= (table[3][x] << 1)&table[7][x];
-				u |= (table[4][x] << 1)&table[6][x];
-				u |= (table[5][x] << 1)&table[5][x];
-				u |= (table[6][x] << 1)&table[4][x];
-				u |= (table[7][x] << 1)&table[3][x];
-				u |= (table[8][x] << 1)&table[2][x];
 				u |= (table[9][x] << 1)&table[1][x];
-				chainTable[x] |= u;
-				chainTable[x] |= (u >> 1);
+
+				u |= (table[2][x] << 1)&table[8][x];
+				u |= (table[8][x] << 1)&table[2][x];
+
+				u |= (table[3][x] << 1)&table[7][x];
+				u |= (table[7][x] << 1)&table[3][x];
+
+				u |= (table[4][x] << 1)&table[6][x];
+				u |= (table[6][x] << 1)&table[4][x];
+
+				u |= (table[5][x] << 1)&table[5][x];
+				if (u > 0)
+				{
+					chainTable[x] |= u;
+					chainTable[x] |= (u >> 1);
+				}
 			}
 		}
 
@@ -70,48 +77,61 @@ private:
 		{
 			if ((recalc&RecalcBitMask[x]) > 0)
 			{
+				//右上
+				uint32_t ru = 0;
+				//右
+				uint32_t r = 0;
+				//右下
+				uint32_t rd = 0;
+
+				r |= (table[1][x])&table[9][x + 1];
+				ru |= (table[1][x] << 1)&table[9][x + 1];
+				rd |= (table[1][x] >> 1)&table[9][x + 1];
+
+				r |= (table[9][x])&table[1][x + 1];
+				ru |= (table[9][x] << 1)&table[1][x + 1];
+				rd |= (table[9][x] >> 1)&table[1][x + 1];
+
+				r |= (table[2][x])&table[8][x + 1];
+				ru |= (table[2][x] << 1)&table[8][x + 1];
+				rd |= (table[2][x] >> 1)&table[8][x + 1];
+
+				r |= (table[8][x])&table[2][x + 1];
+				ru |= (table[8][x] << 1)&table[2][x + 1];
+				rd |= (table[8][x] >> 1)&table[2][x + 1];
+
+				r |= (table[3][x])&table[7][x + 1];
+				ru |= (table[3][x] << 1)&table[7][x + 1];
+				rd |= (table[3][x] >> 1)&table[7][x + 1];
+
+				r |= (table[7][x])&table[3][x + 1];
+				ru |= (table[7][x] << 1)&table[3][x + 1];
+				rd |= (table[7][x] >> 1)&table[3][x + 1];
+
+				r |= (table[4][x])&table[6][x + 1];
+				ru |= (table[4][x] << 1)&table[6][x + 1];
+				rd |= (table[4][x] >> 1)&table[6][x + 1];
+
+				r |= (table[6][x])&table[4][x + 1];
+				ru |= (table[6][x] << 1)&table[4][x + 1];
+				rd |= (table[6][x] >> 1)&table[4][x + 1];
+
+				r |= (table[5][x])&table[5][x + 1];
+				ru |= (table[5][x] << 1)&table[5][x + 1];
+				rd |= (table[5][x] >> 1)&table[5][x + 1];
+
+				if (ru > 0)
 				{
-					//右上
-					uint32_t ru = 0;
-					ru |= (table[1][x] << 1)&table[9][x + 1];
-					ru |= (table[2][x] << 1)&table[8][x + 1];
-					ru |= (table[3][x] << 1)&table[7][x + 1];
-					ru |= (table[4][x] << 1)&table[6][x + 1];
-					ru |= (table[5][x] << 1)&table[5][x + 1];
-					ru |= (table[6][x] << 1)&table[4][x + 1];
-					ru |= (table[7][x] << 1)&table[3][x + 1];
-					ru |= (table[8][x] << 1)&table[2][x + 1];
-					ru |= (table[9][x] << 1)&table[1][x + 1];
 					chainTable[x + 1] |= ru;
 					chainTable[x + 0] |= (ru >> 1);
 				}
+				if (r > 0)
 				{
-					//右
-					uint32_t r = 0;
-					r |= (table[1][x])&table[9][x + 1];
-					r |= (table[2][x])&table[8][x + 1];
-					r |= (table[3][x])&table[7][x + 1];
-					r |= (table[4][x])&table[6][x + 1];
-					r |= (table[5][x])&table[5][x + 1];
-					r |= (table[6][x])&table[4][x + 1];
-					r |= (table[7][x])&table[3][x + 1];
-					r |= (table[8][x])&table[2][x + 1];
-					r |= (table[9][x])&table[1][x + 1];
 					chainTable[x + 1] |= r;
 					chainTable[x + 0] |= r;
 				}
+				if (rd > 0)
 				{
-					//右下
-					uint32_t rd = 0;
-					rd |= (table[1][x] >> 1)&table[9][x + 1];
-					rd |= (table[2][x] >> 1)&table[8][x + 1];
-					rd |= (table[3][x] >> 1)&table[7][x + 1];
-					rd |= (table[4][x] >> 1)&table[6][x + 1];
-					rd |= (table[5][x] >> 1)&table[5][x + 1];
-					rd |= (table[6][x] >> 1)&table[4][x + 1];
-					rd |= (table[7][x] >> 1)&table[3][x + 1];
-					rd |= (table[8][x] >> 1)&table[2][x + 1];
-					rd |= (table[9][x] >> 1)&table[1][x + 1];
 					chainTable[x + 1] |= rd;
 					chainTable[x + 0] |= (rd << 1);
 				}
@@ -377,6 +397,45 @@ public:
 		count -= popcnt(table[11][7]);
 		count -= popcnt(table[11][8]);
 		count -= popcnt(table[11][9]);
+
+		return count;
+	}
+
+	//桂馬型のカウント
+	const int formCheck() const {
+
+		int count = 0;
+
+		for (int x = 0; x < Width - 1; x++)
+		{
+			count += popcnt((table[1][x] << 2) & table[9][x + 1]);
+			count += popcnt((table[1][x] >> 2) & table[9][x + 1]);
+
+			count += popcnt((table[2][x] << 2) & table[8][x + 1]);
+			count += popcnt((table[2][x] >> 2) & table[8][x + 1]);
+
+			count += popcnt((table[3][x] << 2) & table[7][x + 1]);
+			count += popcnt((table[3][x] >> 2) & table[7][x + 1]);
+
+			count += popcnt((table[4][x] << 2) & table[6][x + 1]);
+			count += popcnt((table[4][x] >> 2) & table[6][x + 1]);
+
+			count += popcnt((table[5][x] << 2) & table[5][x + 1]);
+			count += popcnt((table[5][x] >> 2) & table[5][x + 1]);
+
+			count += popcnt((table[6][x] << 2) & table[4][x + 1]);
+			count += popcnt((table[6][x] >> 2) & table[4][x + 1]);
+
+			count += popcnt((table[7][x] << 2) & table[3][x + 1]);
+			count += popcnt((table[7][x] >> 2) & table[3][x + 1]);
+
+			count += popcnt((table[8][x] << 2) & table[2][x + 1]);
+			count += popcnt((table[8][x] >> 2) & table[2][x + 1]);
+
+			count += popcnt((table[9][x] << 2) & table[1][x + 1]);
+			count += popcnt((table[9][x] >> 2) & table[1][x + 1]);
+
+		}
 
 		return count;
 	}

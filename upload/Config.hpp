@@ -18,6 +18,9 @@ namespace Config {
 	constexpr int ApprovalJammingChain = 5;
 	/// <summary>お邪魔ゲージ数</summary>
 	constexpr int JammingGauge = 60;
+	/// <summary>お邪魔数</summary>
+	constexpr int JammingGarbage = 80;
+
 	/// <summary>発火チェイン数</summary>
 	constexpr int ChainIgnition = 10;
 	/// <summary>発火スキルスコア</summary>
