@@ -21,14 +21,20 @@ struct Data {
 	}
 
 	Data() {}
-
+	/*
 	Data(const Data& other) {
 		this->info = other.info;
 		this->com = other.com;
 		this->eval = other.eval;
 		this->chain = other.chain;
 	}
+	*/
+};
 
+struct DataLess {
+	bool operator()(const Data* x, const Data* y) const {
+		return (*x) < (*y);
+	}
 };
 
 struct EnemyData {
@@ -159,7 +165,7 @@ private:
 	}
 
 	[[nodiscard]]
-	std::array<std::priority_queue<Data*>, static_cast<size_t>(Action::Size)> attackThink(const EnemyData& enemy) {
+	std::array<std::priority_queue<Data*, std::vector<Data*>, DataLess>, static_cast<size_t>(Action::Size)> attackThink(const EnemyData& enemy) {
 
 		const auto& share = *Share::Get();
 
@@ -199,13 +205,14 @@ private:
 		Data now;
 		now.info = my.copy();
 
-		std::array<std::priority_queue<Data*>, static_cast<size_t>(Action::Size)> actionData;
+		std::array<std::priority_queue<Data*, std::vector<Data*>, DataLess>, static_cast<size_t>(Action::Size)> actionData;
 
 		for (int pos = 0; pos < PackDropRange; pos++)
 		{
 			for (int rot = 0; rot < 4; rot++)
 			{
 				auto next = new(pool.getAddress()) Data(now);
+				//auto next = new Data(now);
 
 				next->com[0] = Command(pos, rot);
 
@@ -239,7 +246,9 @@ private:
 						}
 					}
 					else
+					{
 						pool.popAddress();
+					}
 				}
 			}
 		}
@@ -247,6 +256,7 @@ private:
 		if (now.info.gauge >= SkillCost)
 		{
 			auto next = new(pool.getAddress()) Data(now);
+			//auto next = new Data(now);
 
 			next->com[0] = Command(true);
 
@@ -266,13 +276,15 @@ private:
 				}
 			}
 			else
+			{
 				pool.popAddress();
+			}
 		}
 
 		return actionData;
 	}
 
-	std::priority_queue<Data*> attackThink() {
+	std::priority_queue<Data*, std::vector<Data*>, DataLess> attackThink() {
 
 		const auto enemyData1 = enemyThink();
 
@@ -326,7 +338,7 @@ public:
 		hashSet.clear();
 		pool.clear();
 
-		std::array<std::priority_queue<Data*>, Config::Turn + 1> qData;
+		std::array <std::priority_queue<Data*, std::vector<Data*>, DataLess>, Config::Turn + 1 > qData;
 
 		auto attack = attackThink();
 		qData[1].swap(attack);
@@ -343,6 +355,7 @@ public:
 				const auto top = qData[t].top();
 				{
 					auto next = new(pool.getAddress()) Data(*top);
+					//auto next = new Data(*top);
 
 					next->com[t] = prevCom[t + 1];
 					const auto chain = next->info.simulation(next->com[t], packs[turn]);
@@ -391,6 +404,7 @@ public:
 						for (int rot = 0; rot < 4; rot++)
 						{
 							auto next = new(pool.getAddress()) Data(*top);
+							//auto next = new Data(*top);
 							copy++;
 
 							next->com[t] = Command(pos, rot);
@@ -410,13 +424,19 @@ public:
 										qData[t + 1].push(std::move(next));
 									}
 									else
+									{
 										pool.popAddress();
+									}
 								}
 								else
+								{
 									pool.popAddress();
+								}
 							}
 							else
+							{
 								pool.popAddress();
+							}
 						}
 					}
 

@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <chrono>
 #include <memory>
+#include <functional>
 
 #include <cmath>
 #include <tuple>
