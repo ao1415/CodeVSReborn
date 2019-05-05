@@ -285,7 +285,7 @@ public:
 	}
 
 	[[nodiscard]]
-	Field copy() const { return std::move(Field(*this)); }
+	Field copy() const { return Field(*this); }
 
 	/// <summary>パックのドロップ</summary>
 	/// <returns>パックドロップ時の結果</returns>
@@ -490,7 +490,7 @@ public:
 
 		field.setElevation();
 
-		return std::move(field);
+		return field;
 	}
 
 };

@@ -190,7 +190,7 @@ private:
 
 			if (my.garbage >= Config::LethalGarbage)
 			{
-				if (my.garbage - chain.garbage >= Config::ToleranceGarbage)
+				if (my.garbage - chain.garbage <= Config::ToleranceGarbage)
 				{
 					return Action::Attack;
 				}
