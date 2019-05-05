@@ -57,7 +57,7 @@ private:
 	std::unordered_set<HashBit> hashSet;
 
 	Action decisionAction;
-	MemoryPool<Data, 1400000> pool;
+	MemoryPool<Data, 1500000> pool;
 
 	[[nodiscard]]
 	EnemyData enemyThink(const int garbage = 0) {
@@ -182,12 +182,9 @@ private:
 
 			if (chain.chain >= Config::JammingChain)
 			{
-				if (enemy.chain.chain <= Config::ApprovalJammingChain)
+				if (enemy.chain.garbage >= Config::JammingGarbage && enemy.chain.chain <= Config::ApprovalJammingChain)
 				{
-					if (enemy.info.gauge >= Config::JammingGauge)
-					{
-						return Action::Jamming;
-					}
+					return Action::Jamming;
 				}
 			}
 
@@ -370,10 +367,10 @@ public:
 		}
 
 		const int thinkTime = [&]() {
-			if (baseTime >= 180 * 1000) return Config::ThinkTime * 3;
-			if (baseTime >= 120 * 1000) return Config::ThinkTime * 2;
-			if (baseTime >= 60 * 1000) return Config::ThinkTime;
-			if (baseTime >= 30 * 1000) return Config::ThinkTime / 2;
+			if (baseTime >= 180 * 1000) return static_cast<int>(Config::ThinkTime * 3.5);
+			if (baseTime >= 120 * 1000) return static_cast<int>(Config::ThinkTime * 2);
+			if (baseTime >= 60 * 1000) return static_cast<int>(Config::ThinkTime);
+			if (baseTime >= 30 * 1000) return static_cast<int>(Config::ThinkTime / 2);
 			return 100;
 		}();
 

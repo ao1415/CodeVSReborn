@@ -50,14 +50,14 @@ public:
 		//const auto skillChain = info.copy().field.useSkill();
 
 		const auto blockNum = info.field.countBlock();
-		//const auto formNum = info.field.formCheck();
+		const auto formNum = info.field.formCheck();
 
 		score = prev.score;
 		score -= chain.score * 10;
 
 		score += potentialChain.chain * 100;
 		score += blockNum * 10;
-		//score += formNum * 10;
+		score += formNum * 10;
 
 		//score += skillChain.score * 10;
 		score += info.gauge / 8.0;
