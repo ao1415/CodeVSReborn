@@ -58,5 +58,8 @@
     <ClInclude Include="Config.hpp">
       <Filter>ソース ファイル\Ai</Filter>
     </ClInclude>
+    <ClInclude Include="Pool.hpp">
+      <Filter>ソース ファイル\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

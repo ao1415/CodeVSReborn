@@ -257,6 +257,7 @@
     <ClInclude Include="Field.hpp" />
     <ClInclude Include="FixedGrid.hpp" />
     <ClInclude Include="Pack.hpp" />
+    <ClInclude Include="Pool.hpp" />
     <ClInclude Include="Share.hpp" />
     <ClInclude Include="SIMD.hpp" />
   </ItemGroup>
