@@ -29,7 +29,7 @@ namespace Config {
 	/// <summary>‹–—e‚¨×–‚”</summary>
 	constexpr int ToleranceGarbage = 30;
 	/// <summary>‹–—e‚¨×–‚”</summary>
-	constexpr int ToleranceCounterGarbage = 10;
+	constexpr int ToleranceCounterGarbage = 20;
 	/// <summary>‹–—e‚¨×–‚”</summary>
 	constexpr int LethalGarbage = 50;
 
