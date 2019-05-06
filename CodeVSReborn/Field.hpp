@@ -440,6 +440,8 @@ public:
 		return count;
 	}
 
+	const std::array<std::array<uint32_t, Width>, 12>& getTable() const { return table; }
+
 	//[[deprecated("used for debug only")]]
 	void debug() const {
 
