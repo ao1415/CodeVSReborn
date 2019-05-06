@@ -107,6 +107,8 @@ private:
 	PlayerInfo m_my;
 	PlayerInfo m_enemy;
 
+	std::array<std::set<int>, MaxTurn> m_packNumbers;
+
 public:
 
 	void first() {
@@ -115,11 +117,29 @@ public:
 		{
 			m_packs[i] = Pack::Create();
 		}
+
+		for (int t = 0; t < MaxTurn; t++)
+		{
+			for (int i = 1; i < Config::PackNumberTurn; i++)
+			{
+				if (t + i >= MaxTurn) break;
+
+				const auto& pack = m_packs[t + i];
+				const auto& grid = pack[0];
+
+				m_packNumbers[t].insert(grid[0][0]);
+				m_packNumbers[t].insert(grid[0][1]);
+				m_packNumbers[t].insert(grid[1][0]);
+				m_packNumbers[t].insert(grid[1][1]);
+				m_packNumbers[t].erase(0);
+			}
+		}
+
 	}
 
 	bool loop() {
 
-		std::cin >> m_turn;
+		if (!(std::cin >> m_turn)) return false;
 
 		bool check = true;
 		check &= m_my.input();
@@ -138,6 +158,10 @@ public:
 	const inline Pack& pack(const int n) const { return m_packs[n]; }
 	[[nodiscard]]
 	const inline Pack& pack() const { return m_packs[m_turn]; }
+	[[nodiscard]]
+	const inline std::array<std::set<int>, MaxTurn>& packNumber() const { return m_packNumbers; }
+	[[nodiscard]]
+	const inline std::set<int>& packNumber(const int n) const { return m_packNumbers[n]; }
 
 	[[nodiscard]]
 	const inline int turn() const { return m_turn; }

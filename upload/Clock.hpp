@@ -1,6 +1,12 @@
 #pragma once
 
-#include "Base.hpp"
+#ifdef _MSC_VER
+#  include <intrin.h>
+#else
+#  include <x86intrin.h>
+#endif
+
+#pragma intrinsic(__rdtsc)
 
 /// <summary>
 	/// 一定時間の経過を確認するクラス
@@ -130,15 +136,22 @@ private:
 	unsigned long long int startCycle = 0;
 	long long time = 0;
 
-	const double CyclePerMilliSec = 2794000.0;
+#ifdef _MSC_VER
+	const double CyclePerMilliSec = 3200000.0;
+#else
+	const double CyclePerMilliSec = 2800000.0;//仮置き
+#endif // _MSC_VER
 
-#ifndef _MSC_VER
 	unsigned long long int getCycle() const {
 		unsigned int low, high;
+
+#ifdef _MSC_VER
+		return (__rdtsc());
+#else
 		__asm__ volatile ("rdtsc" : "=a" (low), "=d" (high));
+#endif // _MSC_VER
 		return ((unsigned long long int)low) | ((unsigned long long int)high << 32);
 	}
-#endif // _MSC_VER
 
 public:
 
@@ -162,11 +175,7 @@ public:
 	/// タイマーを開始させる
 	/// </summary>
 	void start() noexcept {
-#ifdef _MSC_VER
-		s = std::chrono::high_resolution_clock::now();
-#else
 		startCycle = getCycle();
-#endif // _MSC_VER
 	}
 
 	/// <summary>
@@ -174,12 +183,7 @@ public:
 	/// </summary>
 	/// <returns>経過していれば true, それ以外は false</returns>
 	inline const bool check() const noexcept {
-#ifdef _MSC_VER
-		const auto e = std::chrono::high_resolution_clock::now();
-		return std::chrono::duration_cast<std::chrono::milliseconds>(e - s).count() >= time;
-#else
 		return (getCycle() - startCycle) / CyclePerMilliSec >= time;
-#endif // _MSC_VER
 	}
 
 	/// <summary>
@@ -193,12 +197,7 @@ public:
 	/// </summary>
 	/// <returns>計測時間(ミリ秒)</returns>
 	inline const long long interval() const noexcept {
-#ifdef _MSC_VER
-		const auto e = std::chrono::high_resolution_clock::now();
-		return std::chrono::duration_cast<std::chrono::milliseconds>(e - s).count();
-#else
 		return static_cast<long long int>((getCycle() - startCycle) / CyclePerMilliSec);
-#endif // _MSC_VER
 	}
 
 };

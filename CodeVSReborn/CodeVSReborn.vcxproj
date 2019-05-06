@@ -251,11 +251,13 @@
     <ClInclude Include="Ai.hpp" />
     <ClInclude Include="Base.hpp" />
     <ClInclude Include="Clock.hpp" />
+    <ClInclude Include="Config.hpp" />
     <ClInclude Include="Constant.hpp" />
     <ClInclude Include="Evaluation.hpp" />
     <ClInclude Include="Field.hpp" />
     <ClInclude Include="FixedGrid.hpp" />
     <ClInclude Include="Pack.hpp" />
+    <ClInclude Include="Pool.hpp" />
     <ClInclude Include="Share.hpp" />
     <ClInclude Include="SIMD.hpp" />
   </ItemGroup>

@@ -12,11 +12,13 @@
 
 #include <stack>
 #include <queue>
+#include <set>
 #include <unordered_set>
 
 #include <algorithm>
 #include <chrono>
 #include <memory>
+#include <functional>
 
 #include <cmath>
 #include <tuple>
@@ -26,6 +28,8 @@
 
 #include "FixedGrid.hpp"
 #include "Clock.hpp"
+
+#include "Config.hpp"
 
 using PackArray = FixedGrid<Num, PackSize, PackSize>;
 using FieldArray = FixedGrid<Num, Width, Height>;
@@ -87,6 +91,24 @@ struct Chain {
 	int garbage = 0;
 };
 
-inline bool _inside(const int& v, const int& max) { return (0 <= v && v < max); }
-inline bool inside(const int& x, const int& y) { return (_inside(x, Width) && _inside(y, Height)); }
-inline bool inside(const std::pair<int, int>& pos) { return inside(pos.first, pos.second); }
+inline bool _inside(const int v, const int max) { return (0 <= v && v < max); }
+inline bool inside(const int x, const int y) { return (_inside(x, Width) && _inside(y, Height)); }
+inline bool inside(const std::pair<int, int> pos) { return inside(pos.first, pos.second); }
+
+enum class Type {
+	/// <summary>大連鎖型</summary>
+	Chainer,
+	/// <summary>小連鎖型</summary>
+	Jamminger,
+	/// <summary>スキル型</summary>
+	Bomber,
+	/// <summary>未使用</summary>
+	Size
+};
+
+enum class Action {
+	Attack,
+	Jamming,
+	Preparation,
+	Size
+};

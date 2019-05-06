@@ -53,16 +53,23 @@ private:
 				//上
 				uint32_t u = 0;
 				u |= (table[1][x] << 1)&table[9][x];
-				u |= (table[2][x] << 1)&table[8][x];
-				u |= (table[3][x] << 1)&table[7][x];
-				u |= (table[4][x] << 1)&table[6][x];
-				u |= (table[5][x] << 1)&table[5][x];
-				u |= (table[6][x] << 1)&table[4][x];
-				u |= (table[7][x] << 1)&table[3][x];
-				u |= (table[8][x] << 1)&table[2][x];
 				u |= (table[9][x] << 1)&table[1][x];
-				chainTable[x] |= u;
-				chainTable[x] |= (u >> 1);
+
+				u |= (table[2][x] << 1)&table[8][x];
+				u |= (table[8][x] << 1)&table[2][x];
+
+				u |= (table[3][x] << 1)&table[7][x];
+				u |= (table[7][x] << 1)&table[3][x];
+
+				u |= (table[4][x] << 1)&table[6][x];
+				u |= (table[6][x] << 1)&table[4][x];
+
+				u |= (table[5][x] << 1)&table[5][x];
+				if (u > 0)
+				{
+					chainTable[x] |= u;
+					chainTable[x] |= (u >> 1);
+				}
 			}
 		}
 
@@ -70,48 +77,61 @@ private:
 		{
 			if ((recalc&RecalcBitMask[x]) > 0)
 			{
+				//右上
+				uint32_t ru = 0;
+				//右
+				uint32_t r = 0;
+				//右下
+				uint32_t rd = 0;
+
+				r |= (table[1][x])&table[9][x + 1];
+				ru |= (table[1][x] << 1)&table[9][x + 1];
+				rd |= (table[1][x] >> 1)&table[9][x + 1];
+
+				r |= (table[9][x])&table[1][x + 1];
+				ru |= (table[9][x] << 1)&table[1][x + 1];
+				rd |= (table[9][x] >> 1)&table[1][x + 1];
+
+				r |= (table[2][x])&table[8][x + 1];
+				ru |= (table[2][x] << 1)&table[8][x + 1];
+				rd |= (table[2][x] >> 1)&table[8][x + 1];
+
+				r |= (table[8][x])&table[2][x + 1];
+				ru |= (table[8][x] << 1)&table[2][x + 1];
+				rd |= (table[8][x] >> 1)&table[2][x + 1];
+
+				r |= (table[3][x])&table[7][x + 1];
+				ru |= (table[3][x] << 1)&table[7][x + 1];
+				rd |= (table[3][x] >> 1)&table[7][x + 1];
+
+				r |= (table[7][x])&table[3][x + 1];
+				ru |= (table[7][x] << 1)&table[3][x + 1];
+				rd |= (table[7][x] >> 1)&table[3][x + 1];
+
+				r |= (table[4][x])&table[6][x + 1];
+				ru |= (table[4][x] << 1)&table[6][x + 1];
+				rd |= (table[4][x] >> 1)&table[6][x + 1];
+
+				r |= (table[6][x])&table[4][x + 1];
+				ru |= (table[6][x] << 1)&table[4][x + 1];
+				rd |= (table[6][x] >> 1)&table[4][x + 1];
+
+				r |= (table[5][x])&table[5][x + 1];
+				ru |= (table[5][x] << 1)&table[5][x + 1];
+				rd |= (table[5][x] >> 1)&table[5][x + 1];
+
+				if (ru > 0)
 				{
-					//右上
-					uint32_t ru = 0;
-					ru |= (table[1][x] << 1)&table[9][x + 1];
-					ru |= (table[2][x] << 1)&table[8][x + 1];
-					ru |= (table[3][x] << 1)&table[7][x + 1];
-					ru |= (table[4][x] << 1)&table[6][x + 1];
-					ru |= (table[5][x] << 1)&table[5][x + 1];
-					ru |= (table[6][x] << 1)&table[4][x + 1];
-					ru |= (table[7][x] << 1)&table[3][x + 1];
-					ru |= (table[8][x] << 1)&table[2][x + 1];
-					ru |= (table[9][x] << 1)&table[1][x + 1];
 					chainTable[x + 1] |= ru;
 					chainTable[x + 0] |= (ru >> 1);
 				}
+				if (r > 0)
 				{
-					//右
-					uint32_t r = 0;
-					r |= (table[1][x])&table[9][x + 1];
-					r |= (table[2][x])&table[8][x + 1];
-					r |= (table[3][x])&table[7][x + 1];
-					r |= (table[4][x])&table[6][x + 1];
-					r |= (table[5][x])&table[5][x + 1];
-					r |= (table[6][x])&table[4][x + 1];
-					r |= (table[7][x])&table[3][x + 1];
-					r |= (table[8][x])&table[2][x + 1];
-					r |= (table[9][x])&table[1][x + 1];
 					chainTable[x + 1] |= r;
 					chainTable[x + 0] |= r;
 				}
+				if (rd > 0)
 				{
-					//右下
-					uint32_t rd = 0;
-					rd |= (table[1][x] >> 1)&table[9][x + 1];
-					rd |= (table[2][x] >> 1)&table[8][x + 1];
-					rd |= (table[3][x] >> 1)&table[7][x + 1];
-					rd |= (table[4][x] >> 1)&table[6][x + 1];
-					rd |= (table[5][x] >> 1)&table[5][x + 1];
-					rd |= (table[6][x] >> 1)&table[4][x + 1];
-					rd |= (table[7][x] >> 1)&table[3][x + 1];
-					rd |= (table[8][x] >> 1)&table[2][x + 1];
-					rd |= (table[9][x] >> 1)&table[1][x + 1];
 					chainTable[x + 1] |= rd;
 					chainTable[x + 0] |= (rd << 1);
 				}
@@ -161,7 +181,7 @@ private:
 
 				table[0][x] &= (~bombTable[x]);
 
-				disBlock += __popcnt(bombTable[x]);
+				disBlock += popcnt(bombTable[x]);
 			}
 		}
 
@@ -199,19 +219,19 @@ private:
 			if ((recalc & RecalcBitMask[x]) > 0)
 			{
 				//各数字を落下させる
-				table[1][x] = _pext_u32(table[1][x], table[0][x]);
-				table[2][x] = _pext_u32(table[2][x], table[0][x]);
-				table[3][x] = _pext_u32(table[3][x], table[0][x]);
-				table[4][x] = _pext_u32(table[4][x], table[0][x]);
-				table[5][x] = _pext_u32(table[5][x], table[0][x]);
-				table[6][x] = _pext_u32(table[6][x], table[0][x]);
-				table[7][x] = _pext_u32(table[7][x], table[0][x]);
-				table[8][x] = _pext_u32(table[8][x], table[0][x]);
-				table[9][x] = _pext_u32(table[9][x], table[0][x]);
-				table[11][x] = _pext_u32(table[11][x], table[0][x]);
+				table[1][x] = pext(table[1][x], table[0][x]);
+				table[2][x] = pext(table[2][x], table[0][x]);
+				table[3][x] = pext(table[3][x], table[0][x]);
+				table[4][x] = pext(table[4][x], table[0][x]);
+				table[5][x] = pext(table[5][x], table[0][x]);
+				table[6][x] = pext(table[6][x], table[0][x]);
+				table[7][x] = pext(table[7][x], table[0][x]);
+				table[8][x] = pext(table[8][x], table[0][x]);
+				table[9][x] = pext(table[9][x], table[0][x]);
+				table[11][x] = pext(table[11][x], table[0][x]);
 
 				//ブロックを落下させる
-				table[0][x] = _pext_u32(table[0][x], table[0][x]);
+				table[0][x] = pext(table[0][x], table[0][x]);
 
 				nextClac |= RecalcLine[x];
 
@@ -265,7 +285,7 @@ public:
 	}
 
 	[[nodiscard]]
-	Field copy() const { return std::move(Field(*this)); }
+	Field copy() const { return Field(*this); }
 
 	/// <summary>パックのドロップ</summary>
 	/// <returns>パックドロップ時の結果</returns>
@@ -352,6 +372,76 @@ public:
 		return code;
 	}
 
+	const int countBlock() const {
+
+		int count = 0;
+
+		count += popcnt(table[0][0]);
+		count += popcnt(table[0][1]);
+		count += popcnt(table[0][2]);
+		count += popcnt(table[0][3]);
+		count += popcnt(table[0][4]);
+		count += popcnt(table[0][5]);
+		count += popcnt(table[0][6]);
+		count += popcnt(table[0][7]);
+		count += popcnt(table[0][8]);
+		count += popcnt(table[0][9]);
+
+		count -= popcnt(table[11][0]);
+		count -= popcnt(table[11][1]);
+		count -= popcnt(table[11][2]);
+		count -= popcnt(table[11][3]);
+		count -= popcnt(table[11][4]);
+		count -= popcnt(table[11][5]);
+		count -= popcnt(table[11][6]);
+		count -= popcnt(table[11][7]);
+		count -= popcnt(table[11][8]);
+		count -= popcnt(table[11][9]);
+
+		return count;
+	}
+
+	//桂馬型のカウント
+	const int formCheck() const {
+
+		int count = 0;
+
+		for (int x = 0; x < Width - 1; x++)
+		{
+			count += popcnt((table[1][x] << 2) & table[9][x + 1]);
+			count += popcnt((table[1][x] >> 2) & table[9][x + 1]);
+
+			count += popcnt((table[2][x] << 2) & table[8][x + 1]);
+			count += popcnt((table[2][x] >> 2) & table[8][x + 1]);
+
+			count += popcnt((table[3][x] << 2) & table[7][x + 1]);
+			count += popcnt((table[3][x] >> 2) & table[7][x + 1]);
+
+			count += popcnt((table[4][x] << 2) & table[6][x + 1]);
+			count += popcnt((table[4][x] >> 2) & table[6][x + 1]);
+
+			count += popcnt((table[5][x] << 2) & table[5][x + 1]);
+			count += popcnt((table[5][x] >> 2) & table[5][x + 1]);
+
+			count += popcnt((table[6][x] << 2) & table[4][x + 1]);
+			count += popcnt((table[6][x] >> 2) & table[4][x + 1]);
+
+			count += popcnt((table[7][x] << 2) & table[3][x + 1]);
+			count += popcnt((table[7][x] >> 2) & table[3][x + 1]);
+
+			count += popcnt((table[8][x] << 2) & table[2][x + 1]);
+			count += popcnt((table[8][x] >> 2) & table[2][x + 1]);
+
+			count += popcnt((table[9][x] << 2) & table[1][x + 1]);
+			count += popcnt((table[9][x] >> 2) & table[1][x + 1]);
+
+		}
+
+		return count;
+	}
+
+	const std::array<std::array<uint32_t, Width>, 12>& getTable() const { return table; }
+
 	//[[deprecated("used for debug only")]]
 	void debug() const {
 
@@ -402,7 +492,7 @@ public:
 
 		field.setElevation();
 
-		return std::move(field);
+		return field;
 	}
 
 };

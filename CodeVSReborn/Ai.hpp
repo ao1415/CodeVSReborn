@@ -6,6 +6,8 @@
 #include "Share.hpp"
 #include "Evaluation.hpp"
 
+#include "Pool.hpp"
+
 struct Data {
 
 	PlayerInfo info;
@@ -18,6 +20,21 @@ struct Data {
 		return eval < o.eval;
 	}
 
+	Data() {}
+	/*
+	Data(const Data& other) {
+		this->info = other.info;
+		this->com = other.com;
+		this->eval = other.eval;
+		this->chain = other.chain;
+	}
+	*/
+};
+
+struct DataLess {
+	bool operator()(const Data* x, const Data* y) const {
+		return (*x) < (*y);
+	}
 };
 
 struct EnemyData {
@@ -35,9 +52,12 @@ private:
 
 	std::array<Pack, MaxTurn> packs;
 	std::array<Command, Config::Turn> prevCom;
-	bool attackFlag = false;
+	int prevGarbage;
 
 	std::unordered_set<HashBit> hashSet;
+
+	Action decisionAction;
+	MemoryPool<Data, 1500000> pool;
 
 	[[nodiscard]]
 	EnemyData enemyThink(const int garbage = 0) {
@@ -145,46 +165,86 @@ private:
 	}
 
 	[[nodiscard]]
-	std::priority_queue<Data> attackThink(const EnemyData& enemy) {
+	std::array<std::priority_queue<Data*, std::vector<Data*>, DataLess>, static_cast<size_t>(Action::Size)> attackThink(const EnemyData& enemy) {
 
 		const auto& share = *Share::Get();
 
 		const auto& turn = share.turn();
 		const auto& my = share.my();
 
+		//true：攻撃判定
+		const auto rule = [&](const Chain& chain) {
+
+			if (chain.chain >= Config::ChainIgnition)
+			{
+				return Action::Attack;
+			}
+
+			if (chain.chain >= Config::JammingChain)
+			{
+				if (enemy.chain.garbage >= Config::JammingGarbage && enemy.chain.chain <= Config::ApprovalJammingChain)
+				{
+					return Action::Jamming;
+				}
+			}
+
+			if (my.garbage >= Config::LethalGarbage)
+			{
+				if (my.garbage - chain.garbage <= Config::ToleranceGarbage)
+				{
+					return Action::Attack;
+				}
+			}
+
+			return Action::Preparation;
+		};
+
 		Data now;
 		now.info = my.copy();
 
-		std::priority_queue<Data> attack;
-		std::priority_queue<Data> collect;
+		std::array<std::priority_queue<Data*, std::vector<Data*>, DataLess>, static_cast<size_t>(Action::Size)> actionData;
 
 		for (int pos = 0; pos < PackDropRange; pos++)
 		{
 			for (int rot = 0; rot < 4; rot++)
 			{
-				auto next = now;
+				auto next = new(pool.getAddress()) Data(now);
+				//auto next = new Data(now);
 
-				next.com[0] = Command(pos, rot);
+				next->com[0] = Command(pos, rot);
 
-				const auto chain = next.info.simulation(next.com[0], packs[turn]);
+				const auto chain = next->info.simulation(next->com[0], packs[turn]);
+				next->chain = chain;
 
-				if (next.info.field.isSurvival())
+				if (next->info.field.isSurvival())
 				{
-					const auto hashCode = next.info.field.hash();
+					const auto hashCode = next->info.field.hash();
 					if (hashSet.find(hashCode) == hashSet.cend())
 					{
 						hashSet.insert(hashCode);
-						if (chain.chain >= Config::ChainIgnition)
+						next->eval = Evaluation(next->info, chain, Evaluation(), turn);
+
+						const auto action = rule(chain);
+
+						switch (action)
 						{
-							next.eval = Evaluation(next.info, chain, Evaluation(), turn);
-							next.chain = chain;
-							attack.push(std::move(next));
+						case Action::Attack:
+							actionData[static_cast<size_t>(Action::Attack)].push(next);
+							break;
+						case Action::Jamming:
+							actionData[static_cast<size_t>(Action::Jamming)].push(next);
+							break;
+						case Action::Preparation:
+							if (chain.chain <= Config::UselessChain)
+								actionData[static_cast<size_t>(Action::Preparation)].push(next);
+							break;
+						default:
+							break;
 						}
-						else if (chain.chain <= Config::UselessChain)
-						{
-							next.eval = Evaluation(next.info, chain, Evaluation(), turn);
-							collect.push(std::move(next));
-						}
+					}
+					else
+					{
+						pool.popAddress();
 					}
 				}
 			}
@@ -192,31 +252,63 @@ private:
 
 		if (now.info.gauge >= SkillCost)
 		{
-			auto next = now;
+			auto next = new(pool.getAddress()) Data(now);
+			//auto next = new Data(now);
 
-			next.com[0] = Command(true);
+			next->com[0] = Command(true);
 
-			const auto chain = next.info.simulation(next.com[0], packs[turn]);
+			const auto chain = next->info.simulation(next->com[0], packs[turn]);
+			next->chain = chain;
 
-			if (next.info.field.isSurvival())
+			if (next->info.field.isSurvival())
 			{
+				next->eval = Evaluation(next->info, chain, Evaluation(), turn);
 				if (chain.score >= Config::SkillIgnitionScore)
 				{
-					next.eval = Evaluation(next.info, chain, Evaluation(), turn);
-					next.chain = chain;
-					attack.push(std::move(next));
+					actionData[static_cast<size_t>(Action::Attack)].push(next);
 				}
+				else
+				{
+					actionData[static_cast<size_t>(Action::Preparation)].push(next);
+				}
+			}
+			else
+			{
+				pool.popAddress();
 			}
 		}
 
-		attackFlag = false;
-		if (!attack.empty())
+		return actionData;
+	}
+
+	std::priority_queue<Data*, std::vector<Data*>, DataLess> attackThink() {
+
+		const auto enemyData1 = enemyThink();
+
+		auto action = attackThink(enemyData1);
+
+		if (!action[static_cast<size_t>(Action::Attack)].empty())
 		{
-			attackFlag = true;
-			return attack;
+			const auto& top = action[static_cast<size_t>(Action::Attack)].top();
+			const auto garbage = top->chain.garbage;
+			const auto enemyData2 = enemyThink(garbage);
+
+			if (enemyData2.info.garbage >= enemyData1.info.garbage)
+			{
+				decisionAction = Action::Attack;
+				return action[static_cast<size_t>(Action::Attack)];
+			}
 		}
 
-		return collect;
+
+		if (!action[static_cast<size_t>(Action::Jamming)].empty())
+		{
+			decisionAction = Action::Jamming;
+			return action[static_cast<size_t>(Action::Jamming)];
+		}
+
+		decisionAction = Action::Preparation;
+		return action[static_cast<size_t>(Action::Preparation)];
 	}
 
 public:
@@ -241,60 +333,52 @@ public:
 		const auto& field = my.field;
 
 		hashSet.clear();
+		pool.clear();
 
-		std::array<std::priority_queue<Data>, Config::Turn + 1> qData;
+		std::array <std::priority_queue<Data*, std::vector<Data*>, DataLess>, Config::Turn + 1 > qData;
 
-		const auto enemyData = enemyThink();
-
-		//enemyData.chain.debug();
-		//enemyData.info.debug();
-		//enemyData.info.field.debug();
-
-		auto attack = attackThink(enemyData);
+		auto attack = attackThink();
 		qData[1].swap(attack);
 
 		//前回の最善手をセット
-		/*
-		if (!attackFlag)
+		if (decisionAction == Action::Preparation && my.garbage < Width)
 		{
 			for (int t = 1; t < Config::Turn - 1; t++)
 			{
 				const int turn = baseTurn + t;
-
 				if (turn >= MaxTurn) break;
-
 				if (qData[t].empty()) break;
 
-				const auto& top = qData[t].top();
-
+				const auto top = qData[t].top();
 				{
-					auto next = top;
+					auto next = new(pool.getAddress()) Data(*top);
+					//auto next = new Data(*top);
 
-					next.com[t] = prevCom[t + 1];
+					next->com[t] = prevCom[t + 1];
+					const auto chain = next->info.simulation(next->com[t], packs[turn]);
 
-					const auto chain = next.info.simulation(next.com[t], packs[turn]);
-
-					if (next.info.field.isSurvival())
+					if (next->info.field.isSurvival())
 					{
-						next.eval = Evaluation(next.info, chain, top.eval, turn);
-
+						next->eval = Evaluation(next->info, chain, top->eval, turn);
 						qData[t + 1].push(std::move(next));
 					}
 				}
 			}
 		}
-		*/
+
 		const int thinkTime = [&]() {
-			if (baseTime > 120 * 1000) return Config::ThinkTime * 2;
-			if (baseTime > 60 * 1000) return Config::ThinkTime;
-			if (baseTime > 30 * 1000) return Config::ThinkTime / 2;
+			if (baseTime >= 180 * 1000) return static_cast<int>(Config::ThinkTime * 3.5);
+			if (baseTime >= 120 * 1000) return static_cast<int>(Config::ThinkTime * 2);
+			if (baseTime >= 60 * 1000) return static_cast<int>(Config::ThinkTime);
+			if (baseTime >= 30 * 1000) return static_cast<int>(Config::ThinkTime / 2);
 			return 100;
 		}();
 
-		Timer timer;
+		MilliSecTimer timer;
 		timer.set(std::chrono::milliseconds(thinkTime));
 
 		long long int loop = 0;
+		long long int copy = 0;
 
 		timer.start();
 
@@ -310,28 +394,45 @@ public:
 				{
 					if (qData[t].empty()) break;
 
-					const auto& top = qData[t].top();
+					const auto top = qData[t].top();
 
 					for (int pos = 0; pos < PackDropRange; pos++)
 					{
 						for (int rot = 0; rot < 4; rot++)
 						{
-							auto next = top;
+							auto next = new(pool.getAddress()) Data(*top);
+							//auto next = new Data(*top);
+							copy++;
 
-							next.com[t] = Command(pos, rot);
+							next->com[t] = Command(pos, rot);
 
-							const auto chain = next.info.simulation(next.com[t], packs[turn]);
+							const auto chain = next->info.simulation(next->com[t], packs[turn]);
 
-							if (next.info.field.isSurvival())
+							if (chain.chain <= Config::UselessChain)
 							{
-								const auto hashCode = next.info.field.hash();
-								if (hashSet.find(hashCode) == hashSet.cend())
+								if (next->info.field.isSurvival())
 								{
-									hashSet.insert(hashCode);
-									next.eval = Evaluation(next.info, chain, top.eval, turn);
+									const auto hashCode = next->info.field.hash();
+									if (hashSet.find(hashCode) == hashSet.cend())
+									{
+										hashSet.insert(hashCode);
+										next->eval = Evaluation(next->info, chain, top->eval, turn);
 
-									qData[t + 1].push(std::move(next));
+										qData[t + 1].push(std::move(next));
+									}
+									else
+									{
+										pool.popAddress();
+									}
 								}
+								else
+								{
+									pool.popAddress();
+								}
+							}
+							else
+							{
+								pool.popAddress();
 							}
 						}
 					}
@@ -347,19 +448,33 @@ public:
 		{
 			if (!qData[i].empty())
 			{
-				const auto& top = qData[i].top();
-				prevCom = top.com;
+				const auto top = qData[i].top();
+				prevCom = top->com;
 
-				top.info.debug("My Best");
-				top.eval.debug();
+				top->info.debug("My Best");
+				top->eval.debug();
 
-				std::cerr << "loop:" << loop << std::endl;
-				if (attackFlag)
+				std::cerr << "loop:" << loop << ", copy:" << copy << std::endl;
+
+				switch (decisionAction)
 				{
-					std::cerr << "!Ignition!" << std::endl;
-					top.chain.debug();
+				case Action::Attack:
+					std::cerr << ">> Attack" << std::endl;
+					std::cerr << "chain:" << top->chain.chain << std::endl;
+					break;
+				case Action::Jamming:
+					std::cerr << ">> Jamming" << std::endl;
+					std::cerr << "chain:" << top->chain.chain << std::endl;
+					break;
+				case Action::Preparation:
+					std::cerr << ">> Preparation" << std::endl;
+					break;
+				default:
+					break;
 				}
-				return top.com[0];
+				std::cerr << "Memory Use Rate:" << pool.useRate() << std::endl;
+
+				return top->com[0];
 			}
 		}
 

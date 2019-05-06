@@ -4,40 +4,25 @@
 #include "Field.hpp"
 #include "Share.hpp"
 
-namespace Config {
-
-
-	/// <summary>’T¸ƒ^[ƒ“”</summary>
-	constexpr int Turn = 10;
-	/// <summary>’T¸‚Ìƒr[ƒ€•</summary>
-	constexpr int Chokudai = 3;
-	/// <summary>’T¸ŠÔ</summary>
-	constexpr int ThinkTime = 1500;
-
-	constexpr int UselessChain = 1;
-	constexpr int ChainIgnition = 10;
-	constexpr int SkillIgnitionScore = 300;
-
-	/// <summary>“G‚Ì’T¸ƒ^[ƒ“”</summary>
-	constexpr int EnemyThinkTurn = 3;
-
-}
-
 class Evaluation {
 private:
 
 	double score = 0;
 
-	Chain maxChain(const PlayerInfo& info) {
+	Chain maxChain(const PlayerInfo& info, const int turn) {
 
-		const auto& packs = Share::Get()->packs();
+		const auto share = Share::Get();
 
 		Chain max;
 		double chainScore = 0.0;
 
-		for (int pos = 0; pos < Width; pos++)
+		constexpr int DropPos[] = { 0,1,2,3,4,5,6,7,8,9 };
+		const auto& dropNum = share->packNumber(turn);
+		//const int dropNum[] = { 1,2,3,4,5,6,8,9 };
+
+		for (const auto& pos : DropPos)
 		{
-			for (int num = 1; num <= 9; num++)
+			for (const auto& num : dropNum)
 			{
 				auto next = info.copy();
 				auto chain = next.field.dropCell(pos, num);
@@ -60,13 +45,19 @@ public:
 
 		auto random = Random::Get();
 
-		const auto potentialChain = maxChain(info);
+		const auto potentialChain = maxChain(info, turn);
 		//const auto skillChain = info.copy().field.useSkill();
 
-		score = prev.score;
-		score -= chain.score;
+		const auto blockNum = info.field.countBlock();
+		const auto formNum = info.field.formCheck();
 
-		score += potentialChain.chain * 100;
+		score = prev.score;
+		score -= chain.score * 10;
+
+		score += potentialChain.chain * 1000;
+		score += blockNum * 10;
+		score += formNum * 10;
+
 		//score += skillChain.score * 10;
 		score += info.gauge / 8.0;
 
