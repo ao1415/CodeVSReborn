@@ -11,15 +11,14 @@ private:
 
 	Chain maxChain(const PlayerInfo& info, const int turn) {
 
-		const auto& share = Share::Get();
-		const auto& packs = share->packs();
+		const auto share = Share::Get();
 
 		Chain max;
 		double chainScore = 0.0;
 
 		constexpr int DropPos[] = { 0,1,2,3,4,5,6,7,8,9 };
-		//const auto& dropNum = share->packNumber(turn);
-		const int dropNum[] = { 1,2,3,4,5,6,8,9 };
+		const auto& dropNum = share->packNumber(turn);
+		//const int dropNum[] = { 1,2,3,4,5,6,8,9 };
 
 		for (const auto& pos : DropPos)
 		{
@@ -55,7 +54,7 @@ public:
 		score = prev.score;
 		score -= chain.score * 10;
 
-		score += potentialChain.chain * 100;
+		score += potentialChain.chain * 1000;
 		score += blockNum * 10;
 		score += formNum * 10;
 

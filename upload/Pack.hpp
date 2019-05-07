@@ -53,7 +53,7 @@ public:
 		pack.packs[2] = pack.rotate(pack.packs[1]);
 		pack.packs[3] = pack.rotate(pack.packs[2]);
 
-		return std::move(pack);
+		return pack;
 	}
 
 };

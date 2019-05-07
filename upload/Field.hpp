@@ -285,7 +285,7 @@ public:
 	}
 
 	[[nodiscard]]
-	Field copy() const { return std::move(Field(*this)); }
+	Field copy() const { return Field(*this); }
 
 	/// <summary>パックのドロップ</summary>
 	/// <returns>パックドロップ時の結果</returns>
@@ -440,6 +440,8 @@ public:
 		return count;
 	}
 
+	const std::array<std::array<uint32_t, Width>, 12>& getTable() const { return table; }
+
 	//[[deprecated("used for debug only")]]
 	void debug() const {
 
@@ -490,7 +492,7 @@ public:
 
 		field.setElevation();
 
-		return std::move(field);
+		return field;
 	}
 
 };
