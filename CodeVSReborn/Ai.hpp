@@ -57,7 +57,12 @@ private:
 	std::unordered_set<HashBit> hashSet;
 
 	Action decisionAction;
+
+#ifdef _MSC_VER
+	MemoryPool<Data, 2000000> pool;
+#else
 	MemoryPool<Data, 1500000> pool;
+#endif
 
 	[[nodiscard]]
 	EnemyData enemyThink(const int garbage = 0) {
@@ -367,7 +372,7 @@ public:
 		}
 
 		const int thinkTime = [&]() {
-			if (baseTime >= 180 * 1000) return static_cast<int>(Config::ThinkTime * 3.5);
+			if (baseTime >= 180 * 1000) return static_cast<int>(Config::ThinkTime * 8);
 			if (baseTime >= 120 * 1000) return static_cast<int>(Config::ThinkTime * 2);
 			if (baseTime >= 60 * 1000) return static_cast<int>(Config::ThinkTime);
 			if (baseTime >= 30 * 1000) return static_cast<int>(Config::ThinkTime / 2);

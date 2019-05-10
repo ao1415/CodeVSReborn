@@ -17,8 +17,10 @@ private:
 		double chainScore = 0.0;
 
 		constexpr int DropPos[] = { 0,1,2,3,4,5,6,7,8,9 };
-		const auto& dropNum = share->packNumber(turn);
-		//const int dropNum[] = { 1,2,3,4,5,6,8,9 };
+		constexpr std::array<double, 5> Rate{ 1.10,1.05,1.01,1.00,0.90 };
+		//const auto& dropNum = share->packSetNumber(turn);
+		const int dropNum[] = { 1,2,3,4,5,6,8,9 };
+		const auto& numbers = share->packNumber();
 
 		for (const auto& pos : DropPos)
 		{
@@ -27,7 +29,13 @@ private:
 				auto next = info.copy();
 				auto chain = next.field.dropCell(pos, num);
 
-				if (max.score < chain.score)
+				double score = chain.score;
+				if (chain.chain >= Config::ChainIgnition)
+				{
+					score *= Rate[std::min(numbers[turn + 1][num], static_cast<int>(Rate.size() - 1))];
+				}
+
+				if (chainScore < score)
 				{
 					max = chain;
 					chainScore = score;
@@ -49,17 +57,17 @@ public:
 		//const auto skillChain = info.copy().field.useSkill();
 
 		const auto blockNum = info.field.countBlock();
-		const auto formNum = info.field.formCheck();
+		//const auto formNum = info.field.formCheck();
 
 		score = prev.score;
 		score -= chain.score * 10;
 
 		score += potentialChain.chain * 1000;
 		score += blockNum * 10;
-		score += formNum * 10;
+		//score += formNum * 10;
 
 		//score += skillChain.score * 10;
-		score += info.gauge / 8.0;
+		//score += info.gauge / 8.0;
 
 		score += random->swing();
 	}
