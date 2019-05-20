@@ -108,6 +108,7 @@ private:
 	PlayerInfo m_enemy;
 
 	std::array<std::set<int>, MaxTurn> m_packNumbers;
+	std::array<std::array<int, 10>, MaxTurn+1> m_packNumber;
 
 public:
 
@@ -132,8 +133,28 @@ public:
 				m_packNumbers[t].insert(grid[1][0]);
 				m_packNumbers[t].insert(grid[1][1]);
 				m_packNumbers[t].erase(0);
+
 			}
 		}
+
+		std::array<int, 10> number;
+		for (int t = MaxTurn-1; t >= 0; t--)
+		{
+			std::for_each(number.begin(), number.end(), [](int& n) {
+				n++;
+			});
+
+			const auto& pack = m_packs[t];
+			const auto& grid = pack[0];
+
+			number[grid[0][0]] = 0;
+			number[grid[0][1]] = 0;
+			number[grid[1][0]] = 0;
+			number[grid[1][1]] = 0;
+
+			m_packNumber[t] = number;
+		}
+		m_packNumber[MaxTurn].fill(MaxTurn);
 
 	}
 
@@ -159,9 +180,11 @@ public:
 	[[nodiscard]]
 	const inline Pack& pack() const { return m_packs[m_turn]; }
 	[[nodiscard]]
-	const inline std::array<std::set<int>, MaxTurn>& packNumber() const { return m_packNumbers; }
+	const inline std::array<std::set<int>, MaxTurn>& packSetNumber() const { return m_packNumbers; }
 	[[nodiscard]]
-	const inline std::set<int>& packNumber(const int n) const { return m_packNumbers[n]; }
+	const inline std::set<int>& packSetNumber(const int n) const { return m_packNumbers[n]; }
+	[[nodiscard]]
+	const std::array<std::array<int, 10>, MaxTurn + 1>& packNumber() const { return m_packNumber; }
 
 	[[nodiscard]]
 	const inline int turn() const { return m_turn; }

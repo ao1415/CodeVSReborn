@@ -91,9 +91,9 @@ struct Chain {
 	int garbage = 0;
 };
 
-inline bool _inside(const int& v, const int& max) { return (0 <= v && v < max); }
-inline bool inside(const int& x, const int& y) { return (_inside(x, Width) && _inside(y, Height)); }
-inline bool inside(const std::pair<int, int>& pos) { return inside(pos.first, pos.second); }
+inline bool _inside(const int v, const int max) { return (0 <= v && v < max); }
+inline bool inside(const int x, const int y) { return (_inside(x, Width) && _inside(y, Height)); }
+inline bool inside(const std::pair<int, int> pos) { return inside(pos.first, pos.second); }
 
 enum class Type {
 	/// <summary>‘å˜A½Œ^</summary>
