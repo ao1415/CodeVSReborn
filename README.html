@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family:  "Meiryo", "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+</head>
+<body>
+<h1 id="codevsreborn">CodeVSReborn</h1>
+<p><a href="https://codevs.jp">CODE VS Reborn</a> で作成したプログラムです&gt;</p>
+<p>予選結果：42位</p>
+<p>開発環境：Visual Studio 2017<br>
+使用言語：C++17</p>
+<h2 id="%E5%AE%9F%E8%A1%8C%E6%96%B9%E6%B3%95">実行方法</h2>
+<h3 id="gcc">GCC</h3>
+<p>gcc-7以上でコンパイルしてください。<br>
+コンパイルオプションは以下の通りです。<br>
+実行時のオプションはありません。</p>
+<pre class="hljs"><code><div>g++ -std=c++17 -O3 -finput-charset=cp932 -fexec-charset=cp932 -m64 -march=native main.cpp
+</div></code></pre>
+<p>詳細はuploadフォルダ内の<a href="https://github.com/ao1415/CodeVSReborn/blob/master/upload/run.sh">run.sh</a>を参照してください。</p>
+<h3 id="visual-studio-2017">Visual Studio 2017</h3>
+<p>Visual Studio 2017 Update 3以上を適応した状態でビルドしてください。</p>
+<h2 id="%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E6%A7%8B%E6%88%90">ファイル構成</h2>
+<p>AI関係</p>
+<ul>
+<li>main.cpp<br>
+メイン関数とデバッグ用の関数があります。入出力等を行います。</li>
+<li>Ai.hpp<br>
+探査用のクラスです。メイン関数からThink関数が呼ばれます。</li>
+<li>Evaluation.hpp<br>
+フィールドの評価用クラスです。Aiクラスからコンストラクタのみ呼ばれます。</li>
+<li>Field.hpp<br>
+フィールドの管理と、シミュレーションを行うクラスです。</li>
+<li>Pack.hpp<br>
+パック用のクラスです。</li>
+</ul>
+<p>設定関係</p>
+<ul>
+<li>Base.hpp<br>
+ライブラリや型、共有で使用する構造体などを宣言しています。</li>
+<li>Config.hpp<br>
+探査のパラメータを設定しています。</li>
+<li>Constant.hpp<br>
+プログラム内で使用する定数を宣言しています。</li>
+</ul>
+<p>ユーティリティ関係</p>
+<ul>
+<li>Share.hpp<br>
+全体で共有したい情報を管理するクラスです。</li>
+<li>SIMD.hpp<br>
+SIMD命令をインクルードします。</li>
+<li>Pool.hpp<br>
+メモリプールのクラスです。</li>
+<li>Clock.hpp<br>
+時間測定用のクラスです。</li>
+<li>FixedGrid.hpp<br>
+2次元配列用のクラスです。</li>
+</ul>
+<h2 id="%E6%96%B9%E9%87%9D">方針</h2>
+<p>各ターンに、12手先までをChokudaiSearchで探索する。<br>
+各ターンの1手目は全探索を行い、発火するか連鎖を組むか選択する。<br>
+発火判定では、発火した場合としなかった場合で相手の状態を3ターン先まで全探査し、<br>
+相手の最大スコアが下がれば発火するようにした。</p>
+<p>フィールドに何連鎖存在しているかの判別には、各列に1～9のブロックを落として判別した。<br>
+また、評価関数では主に存在している連鎖数とそれを発火できるターン数を使用した。</p>
+<h2 id="%E9%AB%98%E9%80%9F%E5%8C%96">高速化</h2>
+<p>Visual Studioのパフォーマンスプロファイルラーで解析したところ、<br>
+全体の計算時間に対して、キューの挿入に10%・評価時に80%の時間がかかっていたのでその2点の高速化を行った。</p>
+<h3 id="%E3%82%AD%E3%83%A5%E3%83%BC%E3%81%AE%E6%8C%BF%E5%85%A5">キューの挿入</h3>
+<p>探査用の構造体(500Byte程)をそのまま挿入すると時間がかかったので、ポインタに変更した。<br>
+C++では確保した領域を自分で解放する必要があるため、メモリプールを作成し一元管理を行った。</p>
+<p>メモリプールは以下の仕様で実装した。</p>
+<ul>
+<li>ターン毎にデータが紛失する</li>
+<li>確保した領域の先頭から順番に使用する</li>
+<li>最後に使用した領域のみ使わなかったことにできる</li>
+<li>確保した領域を使い切った場合はnullポインタを返す</li>
+</ul>
+<p>最終的に800MB程の領域がメモリプールで持っていかれた。</p>
+<h3 id="%E8%A9%95%E4%BE%A1%E6%99%82">評価時</h3>
+<p>1～9のブロックを各列に落とすため、シミュレーションに大部分の時間がかかっていた。<br>
+そのため、bit演算で消滅・落下処理ができるように以下のように変更した。</p>
+<p>フィールドを19bit(型の関係上32bitで処理する)の1列が10個集まったものと考える。<br>
+フィールドは各数字(1～9・11のブロック)ごとのテーブルと、空白用(0のブロック)のテーブルで構成される。</p>
+<p>消滅判定は各テーブル列のANDを計算することで判定した。</p>
+<pre class="hljs"><code><div>//右の消滅判定(1と9のブロックに対して)
+right     |= (table[1][x]     ) &amp; table[9][x + 1];
+rightUP   |= (table[1][x] &lt;&lt; 1) &amp; table[9][x + 1];
+rightDown |= (table[1][x] &gt;&gt; 1) &amp; table[9][x + 1];
+</div></code></pre>
+<p>落下処理は、各数字のビットマップとブロック有無のビットマップの各列に対してpext命令を行った。<br>
+pext命令用のマスクは、消滅ブロックとブロック有無のビットマップから作成した。</p>
+<h2 id="%E6%84%9F%E6%83%B3">感想</h2>
+<p>高速化で頭がいっぱいになって、戦略の部分が考えられてなかった。<br>
+また、上位陣のリプレイから戦略や工夫点の解析ができていなかった。</p>
+<p>解析するべき内容や、実行環境の工夫ができていなかった。</p>
+<p>bit演算とCPU命令について調べることができたのはよかった。</p>
+<h2 id="q%E3%81%AA%E3%82%93%E3%81%A7c17%E3%81%AA%E3%81%AE%EF%BC%9F">Q.なんでC++17なの？</h2>
+<p>A.[[nodiscard]]属性を使いたかった。</p>
+
+</body>
+</html>

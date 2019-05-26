@@ -4,7 +4,7 @@ namespace Config {
 
 
 	/// <summary>探査ターン数</summary>
-	constexpr int Turn = 15;
+	constexpr int Turn = 12;
 	/// <summary>探査時のビーム幅</summary>
 	constexpr int Chokudai = 3;
 	/// <summary>探査時間</summary>
@@ -13,7 +13,7 @@ namespace Config {
 	/// <summary>許容ロスチェイン数</summary>
 	constexpr int UselessChain = 1;
 	/// <summary>お邪魔チェイン数</summary>
-	constexpr int JammingChain = 4;
+	constexpr int JammingChain = 3;
 	/// <summary>妨害できる相手のチェイン数</summary>
 	constexpr int ApprovalJammingChain = 5;
 	/// <summary>お邪魔ゲージ数</summary>
