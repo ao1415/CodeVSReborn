@@ -4,7 +4,7 @@
 
 予選結果：42位
 
-開発環境：Visual Studio 2017
+開発環境：Visual Studio 2017  
 使用言語：C++17
 
 ## 実行方法
